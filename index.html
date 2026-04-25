@@ -588,6 +588,35 @@ const physicsHTML = `
   <div class="phys-analogy">A guitar string resonates only at wavelengths that "fit" between its endpoints. Your vocal tract is the same — a tube with preferred frequencies determined by its length.</div>
 </div>
 
+<div class="phys-section">
+  <div class="phys-tag">Concept 03b</div>
+  <div class="phys-title">Why is the Speed of Sound Fixed?</div>
+  <div class="phys-body">
+    The speed of sound is not a universal constant like the speed of light — it depends on the <strong>medium</strong>. In air at room temperature (~20°C) it is ~343 m/s, but in water it is ~1480 m/s, and in steel ~5100 m/s. What determines the speed in a given medium?
+    <br><br>
+    Two properties of the medium govern it:
+    <br><br>
+    <strong>1. Elasticity (restoring force)</strong> — how strongly the medium "wants" to spring back after being compressed. A stiffer medium pushes molecules back faster → sound travels faster. Steel is very stiff → very fast. Air is very compressible → slower.
+    <br><br>
+    <strong>2. Inertia (density)</strong> — how heavy the molecules are. Heavier molecules are harder to accelerate, so the wave propagates more slowly. This is why helium (very light molecules) conducts sound faster than air (~927 m/s), making your voice sound high-pitched — the wavelengths shorten while your vocal folds still vibrate at the same frequency.
+    <br><br>
+    In air, the formula is: <strong>v = √(γP/ρ)</strong> — where γ is the adiabatic index (how air responds to compression), P is air pressure, and ρ is air density. At a given temperature, pressure and density change together proportionally, so they cancel out — leaving speed determined almost entirely by <strong>temperature alone</strong>.
+    <br><br>
+    The rule of thumb: <strong>speed increases by ~0.6 m/s for every 1°C rise in temperature</strong>. Warmer air → faster-moving molecules → they transmit the pressure disturbance more quickly.
+  </div>
+  <canvas id="pd_soundspeed" class="pdiag" height="150"></canvas>
+  <div class="pleg">
+    <span><b style="color:#4af0c4">●</b> Cold air (0°C) — 331 m/s</span>
+    <span><b style="color:#f0c040">●</b> Room temp (20°C) — 343 m/s</span>
+    <span><b style="color:#f06050">●</b> Body temp (37°C) — 353 m/s</span>
+    <span><b style="color:#e080ff">●</b> Helium (20°C) — 927 m/s</span>
+  </div>
+  <div class="phys-body" style="margin-top:4px">
+    Inside your vocal tract, the air is warmed to near body temperature (~35°C), so sound actually travels at about <strong>352 m/s</strong> — slightly faster than in the room around you. This shifts your formant frequencies up slightly compared to a cold open tube of the same length.
+  </div>
+  <div class="phys-analogy">Why does helium make your voice sound high? The speed of sound in helium is ~2.7× faster than in air. Faster speed + same vocal tract length = formants shift up to ~2.7× higher frequencies. Your vocal folds still buzz at the same pitch — only the resonances change. It sounds "squeaky" because F1 and F2 shoot up dramatically.</div>
+</div>
+
 <hr class="phys-divider">
 <div class="phys-chapter">Chapter 02 — Resonance & Standing Waves</div>
 
@@ -817,6 +846,70 @@ function startPhysicsAnims() {
     wc.setLineDash([]);
     wc.fillStyle = '#7090ff'; wc.font = '7px Space Mono,monospace';
     wc.fillText('your vocal tract', 12, H*0.36 + 10);
+  })();
+
+  // --- 3b. SPEED OF SOUND comparison ---
+  (function() {
+    const sc = getCtx('pd_soundspeed', 150);
+    if (!sc) return;
+    const W = sc._W, H = sc._H;
+    sc.fillStyle = '#0d1318'; sc.fillRect(0,0,W,H);
+
+    const media = [
+      { label: 'Cold air (0°C)',      speed: 331,  color: '#4af0c4', note: 'low-energy molecules' },
+      { label: 'Room air (20°C)',     speed: 343,  color: '#f0c040', note: 'standard reference' },
+      { label: 'Body temp air (37°C)',speed: 353,  color: '#f06050', note: 'inside your throat' },
+      { label: 'Helium (20°C)',       speed: 927,  color: '#e080ff', note: 'light molecules, very fast' },
+    ];
+
+    const maxSpeed = 1000;
+    const barH = 22, gap = 10;
+    const mx = 170, barMaxW = W - mx - 16;
+    const startY = 16;
+
+    media.forEach((m, i) => {
+      const y = startY + i * (barH + gap);
+      const bw = (m.speed / maxSpeed) * barMaxW;
+
+      // Bar background
+      sc.fillStyle = '#111820';
+      sc.fillRect(mx, y, barMaxW, barH);
+
+      // Bar fill with gradient
+      const grad = sc.createLinearGradient(mx, 0, mx + bw, 0);
+      grad.addColorStop(0, m.color + '44');
+      grad.addColorStop(1, m.color);
+      sc.fillStyle = grad;
+      sc.fillRect(mx, y, bw, barH);
+
+      // Glow line on top of bar
+      sc.fillStyle = m.color;
+      sc.fillRect(mx + bw - 3, y, 3, barH);
+
+      // Label (left)
+      sc.fillStyle = m.color;
+      sc.font = 'bold 8px Space Mono,monospace';
+      sc.textAlign = 'right';
+      sc.fillText(m.label, mx - 6, y + barH * 0.55);
+
+      // Speed value (right of bar)
+      sc.fillStyle = m.color;
+      sc.font = 'bold 9px Space Mono,monospace';
+      sc.textAlign = 'left';
+      sc.fillText(m.speed + ' m/s', mx + bw + 5, y + barH * 0.55);
+
+      // Note (smaller, dimmer)
+      sc.fillStyle = '#4a6a5a';
+      sc.font = '7px Space Mono,monospace';
+      sc.fillText(m.note, mx + bw + 5, y + barH * 0.55 + 10);
+
+      sc.textAlign = 'left';
+    });
+
+    // Temperature scale hint at bottom
+    sc.fillStyle = '#2a3a4a';
+    sc.font = '7.5px Space Mono,monospace';
+    sc.fillText('Speed increases ~0.6 m/s per °C rise in temperature   |   v = √(γP/ρ)', mx, startY + media.length * (barH + gap) + 10);
   })();
 
   // --- 4. RESONANCE: IN-SYNC vs OUT-OF-SYNC ---
