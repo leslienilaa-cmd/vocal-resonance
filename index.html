@@ -1670,146 +1670,533 @@ function drawBodyTab() {
   const w = W(), h = H();
   ctx.clearRect(0, 0, w, h);
 
-  const cx = w * 0.38;
-  const cy = h * 0.5;
-  const scale = Math.min(w, h) * 0.0028;
+  // Background grid
+  ctx.strokeStyle = '#12181f';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < w; x += 32) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+  for (let y = 0; y < h; y += 32) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
 
-  function drawOval(x, y, rx, ry, color, alpha, glow) {
-    ctx.beginPath();
-    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-    if (glow) { ctx.shadowBlur = 18; ctx.shadowColor = color; }
-    ctx.fillStyle = color.replace(')', `,${alpha})`).replace('rgb', 'rgba');
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+  // ── Layout: sagittal view centered slightly left, labels on right ──
+  const S   = Math.min(w * 0.55, h * 0.9);   // overall scale unit
+  const ox  = w * 0.13;                        // left origin x
+  const oy  = h * 0.5 - S * 0.3;              // top of head origin y
+
+  // Animation oscillators
+  const breathPhase  = t * 0.018;
+  const foldPhase    = t * 0.11 * (state.pitch / 120);
+  const breathAmp    = Math.sin(breathPhase);
+  const foldOsc      = Math.sin(foldPhase) * state.volume;
+  const pressureFlow = (Math.sin(foldPhase * 0.5) * 0.5 + 0.5) * state.volume;
+
+  // ── Colour palette ──
+  const C = {
+    skin:    '#1a2535',
+    skinStr: '#2a3a50',
+    bone:    '#223040',
+    boneStr: '#3a5060',
+    mucosa:  '#2a1825',
+    airway:  '#0a1520',
+    airStr:  '#1a3040',
+    tongue:  '#3a1a20',
+    tongueStr:'#5a2a30',
+    softPal: '#2a1a2a',
+    softStr: '#4a2a3a',
+    vocal:   '#7090ff',
+    nasal:   '#7090ff',
+    oral:    '#4af0c4',
+    pharynx: '#4af0c4',
+    larynx:  '#f0c040',
+    trachea: '#f0c040',
+    lung:    '#f0c040',
+    label:   '#c8d8e8',
+    muted:   '#4a6070',
+  };
+
+  function fill(color, alpha=1) {
+    ctx.fillStyle = alpha < 1
+      ? color.replace('#', 'rgba(').replace(/(..)(..)(..)/, (_,r,g,b) =>
+          `${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`) + `,${alpha})`
+      : color;
   }
 
-  // Head
-  ctx.beginPath();
-  ctx.ellipse(cx, cy - 115 * scale, 38 * scale, 46 * scale, 0, 0, Math.PI * 2);
-  ctx.strokeStyle = '#2a3a4a';
-  ctx.lineWidth = 1.5;
-  ctx.fillStyle = '#0d1520';
-  ctx.fill(); ctx.stroke();
-
-  // Nasal cavity
-  const nasalOsc = Math.sin(t * 0.09 * (state.pitch / 120)) * state.volume;
-  const nasalAlpha = 0.15 + Math.abs(nasalOsc) * (state.vowel === 'hum' ? 0.55 : 0.2);
-  drawOval(cx, cy - 132 * scale, 20 * scale, 12 * scale, 'rgb(112,144,255)', nasalAlpha, state.vowel === 'hum');
-  ctx.fillStyle = '#4a5a7a';
-  ctx.font = `${8 * scale}px Space Mono`;
-  ctx.fillText('NASAL', cx - 16 * scale, cy - 144 * scale);
-
-  // Oral cavity
-  const oralOsc = Math.sin(t * 0.09 * (state.pitch / 120) + 0.5) * state.volume;
-  const oralAlpha = 0.15 + Math.abs(oralOsc) * 0.4;
-  drawOval(cx + 6 * scale, cy - 112 * scale, 22 * scale, 9 * scale, 'rgb(74,240,196)', oralAlpha, true);
-  ctx.fillStyle = '#4af0c4'; ctx.font = `${8 * scale}px Space Mono`;
-  ctx.fillText('ORAL', cx - 8 * scale, cy - 120 * scale);
-
-  // Neck / pharynx
-  ctx.beginPath();
-  ctx.rect(cx - 14 * scale, cy - 80 * scale, 28 * scale, 55 * scale);
-  ctx.fillStyle = '#0d1520'; ctx.fill();
-  ctx.strokeStyle = '#2a3a4a'; ctx.lineWidth = 1.5; ctx.stroke();
-
-  // Larynx / vocal fold marker
-  const foldY = cy - 38 * scale;
-  const foldOsc = Math.sin(t * 0.12 * (state.pitch / 120)) * 3 * scale * state.volume;
-  ctx.beginPath();
-  ctx.moveTo(cx - 14 * scale, foldY);
-  ctx.lineTo(cx - foldOsc, foldY);
-  ctx.strokeStyle = '#7090ff'; ctx.lineWidth = 2.5;
-  ctx.shadowBlur = 10; ctx.shadowColor = '#7090ff'; ctx.stroke(); ctx.shadowBlur = 0;
-  ctx.beginPath();
-  ctx.moveTo(cx + 14 * scale, foldY);
-  ctx.lineTo(cx + foldOsc, foldY);
-  ctx.strokeStyle = '#7090ff'; ctx.lineWidth = 2.5;
-  ctx.shadowBlur = 10; ctx.shadowColor = '#7090ff'; ctx.stroke(); ctx.shadowBlur = 0;
-
-  ctx.fillStyle = '#7090ff';
-  ctx.font = `${8 * scale}px Space Mono`;
-  ctx.fillText('VOCAL FOLDS', cx + 18 * scale, foldY + 3 * scale);
-
-  // Trachea
-  ctx.beginPath();
-  ctx.rect(cx - 10 * scale, cy - 20 * scale, 20 * scale, 40 * scale);
-  ctx.fillStyle = '#0a1018'; ctx.fill();
-  ctx.strokeStyle = '#1e2530'; ctx.lineWidth = 1; ctx.stroke();
-
-  // Lungs
-  const lungOsc = Math.sin(t * 0.03) * 5 * scale;
-  const lungAlpha = 0.12 + Math.abs(Math.sin(t * 0.08 * (state.pitch / 120))) * state.volume * 0.3;
-
-  drawOval(cx - 40 * scale, cy + 40 * scale, 28 * scale + lungOsc, 50 * scale + lungOsc, 'rgb(240,192,64)', lungAlpha, false);
-  drawOval(cx + 40 * scale, cy + 40 * scale, 28 * scale + lungOsc, 50 * scale + lungOsc, 'rgb(240,192,64)', lungAlpha, false);
-  ctx.fillStyle = '#8a7a30'; ctx.font = `${8 * scale}px Space Mono`;
-  ctx.fillText('LUNGS', cx - 14 * scale, cy + 90 * scale);
-
-  // Chest resonance waves
-  const chestAmp = state.volume * 12 * scale;
-  const chestOsc = Math.sin(t * 0.09 * (state.pitch / 120));
-  if (Math.abs(chestOsc) > 0.1) {
-    for (let ring = 1; ring <= 3; ring++) {
-      const rAlpha = (0.3 - ring * 0.08) * Math.abs(chestOsc) * state.volume;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy + 40 * scale, (30 + ring * 18) * scale, (60 + ring * 14) * scale, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(240,192,64,${rAlpha})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
+  // Helper: hex to rgba
+  function rgba(hex, a) {
+    const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
   }
 
-  // Sinus / skull resonance
-  const sinusOsc = Math.sin(t * 0.11 * (state.pitch / 120) + 1) * state.volume;
-  if (Math.abs(sinusOsc) > 0.05) {
-    for (let ring = 1; ring <= 2; ring++) {
-      const rAlpha = (0.25 - ring * 0.1) * Math.abs(sinusOsc);
-      ctx.beginPath();
-      ctx.ellipse(cx, cy - 115 * scale, (40 + ring * 14) * scale, (48 + ring * 12) * scale, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(112,144,255,${rAlpha})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
+  function label(text, x, y, color='#7a9aaa', size=9, bold=false) {
+    ctx.fillStyle = color;
+    ctx.font = `${bold?'bold ':''}${size}px Space Mono, monospace`;
+    ctx.fillText(text, x, y);
   }
 
-  // Air flow arrow from lungs up
-  const arrowOsc = 0.5 + 0.5 * Math.abs(Math.sin(t * 0.1 * (state.pitch / 120)));
-  ctx.strokeStyle = `rgba(240,192,64,${arrowOsc * 0.6})`;
-  ctx.lineWidth = 2;
-  ctx.setLineDash([4, 4]);
+  function annotate(name, desc, x, y, color) {
+    // Dot
+    ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+    // Line to label area
+    const lx = w * 0.72;
+    ctx.strokeStyle = rgba(color, 0.3); ctx.lineWidth = 0.8;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x+5, y); ctx.lineTo(lx-4, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = color; ctx.font = 'bold 9px Space Mono,monospace';
+    ctx.fillText(name, lx, y-1);
+    ctx.fillStyle = '#4a6070'; ctx.font = '7.5px Space Mono,monospace';
+    ctx.fillText(desc, lx, y+10);
+  }
+
+  // ── Scale helpers relative to S ──
+  const X = (v) => ox + v * S;
+  const Y = (v) => oy + v * S;
+
+  // ═══════════════════════════════════════════════════
+  // 1. SKULL OUTLINE (sagittal profile, right-facing)
+  // ═══════════════════════════════════════════════════
   ctx.beginPath();
-  ctx.moveTo(cx, cy + 20 * scale);
-  ctx.lineTo(cx, cy - 30 * scale);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // Start at back of skull (left), go clockwise
+  ctx.moveTo(X(0.08), Y(0.55));           // back of neck
+  ctx.lineTo(X(0.08), Y(0.28));           // back of skull low
+  ctx.bezierCurveTo(
+    X(0.08), Y(0.04),   X(0.22), Y(-0.02),  X(0.42), Y(0.02)   // top of skull
+  );
+  ctx.bezierCurveTo(
+    X(0.60), Y(0.06),   X(0.66), Y(0.18),  X(0.64), Y(0.30)   // forehead to brow
+  );
+  // Nose
+  ctx.bezierCurveTo(
+    X(0.64), Y(0.34),   X(0.68), Y(0.38),  X(0.66), Y(0.44)   // nose bridge
+  );
+  ctx.bezierCurveTo(
+    X(0.64), Y(0.48),   X(0.62), Y(0.50),  X(0.60), Y(0.52)   // nose tip
+  );
+  ctx.bezierCurveTo(
+    X(0.62), Y(0.54),   X(0.64), Y(0.56),  X(0.63), Y(0.60)   // upper lip
+  );
+  // Lips & chin
+  ctx.bezierCurveTo(
+    X(0.62), Y(0.64),   X(0.60), Y(0.66),  X(0.58), Y(0.68)   // lower lip
+  );
+  ctx.bezierCurveTo(
+    X(0.56), Y(0.72),   X(0.52), Y(0.76),  X(0.48), Y(0.76)   // chin
+  );
+  ctx.bezierCurveTo(
+    X(0.42), Y(0.76),   X(0.36), Y(0.74),  X(0.30), Y(0.72)   // jaw bottom
+  );
+  ctx.lineTo(X(0.20), Y(0.68));           // jaw to neck
+  ctx.bezierCurveTo(
+    X(0.15), Y(0.66),   X(0.12), Y(0.62),  X(0.10), Y(0.58)   // front of neck
+  );
+  ctx.lineTo(X(0.08), Y(0.55));           // back to start
+  ctx.fillStyle = C.skin; ctx.fill();
+  ctx.strokeStyle = C.skinStr; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 2. SKULL BONE (inner cranium outline)
+  // ═══════════════════════════════════════════════════
   ctx.beginPath();
-  ctx.moveTo(cx - 5 * scale, cy - 26 * scale);
-  ctx.lineTo(cx, cy - 35 * scale);
-  ctx.lineTo(cx + 5 * scale, cy - 26 * scale);
-  ctx.fillStyle = `rgba(240,192,64,${arrowOsc * 0.6})`;
+  ctx.moveTo(X(0.12), Y(0.48));
+  ctx.bezierCurveTo(X(0.12), Y(0.18), X(0.24), Y(0.05), X(0.42), Y(0.08));
+  ctx.bezierCurveTo(X(0.58), Y(0.11), X(0.62), Y(0.22), X(0.60), Y(0.32));
+  ctx.bezierCurveTo(X(0.58), Y(0.36), X(0.58), Y(0.40), X(0.56), Y(0.45));
+  ctx.lineTo(X(0.12), Y(0.48));
+  ctx.fillStyle = C.bone; ctx.fill();
+  ctx.strokeStyle = C.boneStr; ctx.lineWidth = 1; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 3. BRAIN (inside skull)
+  // ═══════════════════════════════════════════════════
+  ctx.beginPath();
+  ctx.ellipse(X(0.36), Y(0.26), S*0.18, S*0.16, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#1a1825'; ctx.fill();
+  ctx.strokeStyle = '#2a2835'; ctx.lineWidth = 0.8; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 4. NASAL CAVITY
+  // ═══════════════════════════════════════════════════
+  const nasalGlow = 0.15 + Math.abs(Math.sin(foldPhase * 1.1)) * (state.vowel === 'hum' ? 0.5 : 0.15) * state.volume;
+  ctx.beginPath();
+  ctx.moveTo(X(0.36), Y(0.44));
+  ctx.bezierCurveTo(X(0.36), Y(0.40), X(0.38), Y(0.36), X(0.45), Y(0.35));
+  ctx.bezierCurveTo(X(0.52), Y(0.34), X(0.60), Y(0.36), X(0.62), Y(0.40));
+  ctx.bezierCurveTo(X(0.63), Y(0.43), X(0.61), Y(0.46), X(0.58), Y(0.47));
+  ctx.bezierCurveTo(X(0.52), Y(0.48), X(0.44), Y(0.48), X(0.36), Y(0.44));
+  ctx.fillStyle = rgba(C.nasal, nasalGlow * 0.6 + 0.1);
   ctx.fill();
-
-  // Labels panel (right)
-  const lx = w * 0.68;
-  const items = [
-    { color: '#7090ff', label: 'Vocal folds', desc: `${state.pitch}Hz buzz` },
-    { color: '#4af0c4', label: 'Oral cavity', desc: 'F1/F2 shaped' },
-    { color: '#7090ff', label: 'Nasal cavity', desc: state.vowel === 'hum' ? 'Active (humming)' : 'Minor role' },
-    { color: '#f0c040', label: 'Chest / lungs', desc: 'Air pressure source' },
-  ];
-  items.forEach((item, i) => {
-    const iy = cy - 80 * scale + i * 36;
+  ctx.strokeStyle = rgba(C.nasal, 0.5); ctx.lineWidth = 1; ctx.stroke();
+  if (state.vowel === 'hum') {
+    ctx.shadowBlur = 12; ctx.shadowColor = C.nasal;
+    ctx.stroke(); ctx.shadowBlur = 0;
+  }
+  // Nasal turbinates (3 curved shelves)
+  for (let i = 0; i < 3; i++) {
+    const ty = Y(0.375 + i * 0.025);
     ctx.beginPath();
-    ctx.arc(lx, iy, 5, 0, Math.PI * 2);
-    ctx.fillStyle = item.color; ctx.fill();
-    ctx.fillStyle = '#c8d8e8'; ctx.font = `bold ${9 * scale}px Space Mono`;
-    ctx.fillText(item.label, lx + 12, iy - 2);
-    ctx.fillStyle = '#5a6a7a'; ctx.font = `${8 * scale}px Space Mono`;
-    ctx.fillText(item.desc, lx + 12, iy + 12);
+    ctx.moveTo(X(0.42 + i*0.02), ty);
+    ctx.bezierCurveTo(X(0.50), ty - S*0.008, X(0.56), ty, X(0.57), ty + S*0.005);
+    ctx.strokeStyle = rgba(C.nasal, 0.4); ctx.lineWidth = 1; ctx.stroke();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 5. HARD PALATE (roof of mouth)
+  // ═══════════════════════════════════════════════════
+  ctx.beginPath();
+  ctx.moveTo(X(0.36), Y(0.48));
+  ctx.bezierCurveTo(X(0.44), Y(0.47), X(0.54), Y(0.48), X(0.58), Y(0.49));
+  ctx.lineTo(X(0.58), Y(0.51));
+  ctx.bezierCurveTo(X(0.54), Y(0.50), X(0.44), Y(0.50), X(0.36), Y(0.51));
+  ctx.closePath();
+  ctx.fillStyle = C.bone; ctx.fill();
+  ctx.strokeStyle = C.boneStr; ctx.lineWidth = 1; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 6. TONGUE (position reactive to state.tongue)
+  // ═══════════════════════════════════════════════════
+  const tPos   = state.tongue;  // 0=low/flat, 1=high/front
+  const tongueRaiseY = tPos * S * 0.10;
+  const tongueAdvX   = tPos * S * 0.06;
+
+  ctx.beginPath();
+  // Tongue body - fills floor of mouth, curves up based on tongue position
+  ctx.moveTo(X(0.14), Y(0.68));  // back root
+  ctx.bezierCurveTo(
+    X(0.18), Y(0.62),
+    X(0.24), Y(0.58),
+    X(0.30 + tPos*0.04), Y(0.56 - tPos*0.06)   // back hump
+  );
+  ctx.bezierCurveTo(
+    X(0.36 + tongueAdvX*0.5/S), Y(0.54 - tongueRaiseY/S),
+    X(0.46 + tongueAdvX/S),     Y(0.52 - tongueRaiseY/S),
+    X(0.55), Y(0.54)            // tongue tip near teeth
+  );
+  ctx.bezierCurveTo(
+    X(0.57), Y(0.56),
+    X(0.58), Y(0.60),
+    X(0.57), Y(0.64)            // lower lip area
+  );
+  ctx.bezierCurveTo(
+    X(0.50), Y(0.67),
+    X(0.36), Y(0.70),
+    X(0.22), Y(0.70)            // jaw floor
+  );
+  ctx.bezierCurveTo(
+    X(0.17), Y(0.70),
+    X(0.13), Y(0.69),
+    X(0.14), Y(0.68)
+  );
+  ctx.fillStyle = C.tongue; ctx.fill();
+  ctx.strokeStyle = C.tongueStr; ctx.lineWidth = 1.2; ctx.stroke();
+
+  // Tongue surface highlight
+  ctx.beginPath();
+  ctx.moveTo(X(0.22), Y(0.64));
+  ctx.bezierCurveTo(
+    X(0.34), Y(0.60 - tPos*0.04),
+    X(0.46), Y(0.56 - tPos*0.07),
+    X(0.54), Y(0.57)
+  );
+  ctx.strokeStyle = rgba('#7a3a40', 0.6); ctx.lineWidth = 1; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 7. SOFT PALATE + UVULA
+  // ═══════════════════════════════════════════════════
+  ctx.beginPath();
+  ctx.moveTo(X(0.36), Y(0.51));
+  ctx.bezierCurveTo(X(0.30), Y(0.52), X(0.24), Y(0.54), X(0.20), Y(0.57));
+  ctx.bezierCurveTo(X(0.18), Y(0.58), X(0.17), Y(0.60), X(0.18), Y(0.62));
+  ctx.bezierCurveTo(X(0.20), Y(0.63), X(0.22), Y(0.62), X(0.23), Y(0.60));
+  ctx.bezierCurveTo(X(0.25), Y(0.58), X(0.28), Y(0.56), X(0.36), Y(0.55));
+  ctx.closePath();
+  ctx.fillStyle = C.softPal; ctx.fill();
+  ctx.strokeStyle = C.softStr; ctx.lineWidth = 1; ctx.stroke();
+  // Uvula
+  ctx.beginPath();
+  ctx.moveTo(X(0.19), Y(0.62));
+  ctx.bezierCurveTo(X(0.18), Y(0.64), X(0.17), Y(0.65), X(0.185), Y(0.67));
+  ctx.bezierCurveTo(X(0.20), Y(0.68), X(0.21), Y(0.67), X(0.21), Y(0.65));
+  ctx.strokeStyle = C.softStr; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 8. ORAL CAVITY AIRSPACE
+  // ═══════════════════════════════════════════════════
+  const oralGlow = 0.1 + Math.abs(foldOsc) * 0.35;
+  ctx.beginPath();
+  ctx.moveTo(X(0.36), Y(0.51));   // back (hard palate)
+  ctx.bezierCurveTo(X(0.44), Y(0.50), X(0.54), Y(0.50), X(0.58), Y(0.51));
+  ctx.lineTo(X(0.58), Y(0.54));   // front teeth
+  ctx.bezierCurveTo(X(0.54), Y(0.52), X(0.48), Y(0.52 - tPos*0.04), X(0.36), Y(0.53));
+  ctx.closePath();
+  ctx.fillStyle = rgba(C.oral, oralGlow);
+  ctx.fill();
+  if (oralGlow > 0.2) { ctx.shadowBlur = 8; ctx.shadowColor = C.oral; ctx.stroke(); ctx.shadowBlur = 0; }
+
+  // ═══════════════════════════════════════════════════
+  // 9. UPPER & LOWER TEETH (simplified)
+  // ═══════════════════════════════════════════════════
+  // Upper teeth
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.rect(X(0.575 - i*0.018), Y(0.505), S*0.014, S*0.022);
+    ctx.fillStyle = '#2a3a4a'; ctx.fill();
+    ctx.strokeStyle = '#3a5060'; ctx.lineWidth = 0.5; ctx.stroke();
+  }
+  // Lower teeth
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.rect(X(0.575 - i*0.018), Y(0.635), S*0.014, S*0.022);
+    ctx.fillStyle = '#2a3a4a'; ctx.fill();
+    ctx.strokeStyle = '#3a5060'; ctx.lineWidth = 0.5; ctx.stroke();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 10. JAW BONE (mandible)
+  // ═══════════════════════════════════════════════════
+  ctx.beginPath();
+  ctx.moveTo(X(0.22), Y(0.70));
+  ctx.bezierCurveTo(X(0.36), Y(0.72), X(0.50), Y(0.73), X(0.57), Y(0.70));
+  ctx.bezierCurveTo(X(0.58), Y(0.68), X(0.58), Y(0.65), X(0.57), Y(0.64));
+  ctx.lineTo(X(0.57), Y(0.66));
+  ctx.bezierCurveTo(X(0.50), Y(0.70), X(0.35), Y(0.72), X(0.22), Y(0.72));
+  ctx.closePath();
+  ctx.fillStyle = C.bone; ctx.fill();
+  ctx.strokeStyle = C.boneStr; ctx.lineWidth = 1; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 11. PHARYNX (back of throat, connects oral to larynx)
+  // ═══════════════════════════════════════════════════
+  const pharynxGlow = 0.12 + Math.abs(foldOsc) * 0.3;
+  ctx.beginPath();
+  ctx.moveTo(X(0.10), Y(0.58));   // front of neck
+  ctx.bezierCurveTo(X(0.11), Y(0.60), X(0.13), Y(0.62), X(0.15), Y(0.64));
+  ctx.lineTo(X(0.15), Y(0.82));   // down to larynx
+  ctx.lineTo(X(0.08), Y(0.82));
+  ctx.lineTo(X(0.08), Y(0.58));
+  ctx.closePath();
+  ctx.fillStyle = rgba(C.pharynx, pharynxGlow);
+  ctx.fill();
+  ctx.strokeStyle = rgba(C.pharynx, 0.4); ctx.lineWidth = 1; ctx.stroke();
+
+  // Pharynx walls
+  ctx.beginPath();
+  ctx.moveTo(X(0.10), Y(0.58)); ctx.lineTo(X(0.10), Y(0.82));
+  ctx.moveTo(X(0.15), Y(0.64)); ctx.lineTo(X(0.15), Y(0.82));
+  ctx.strokeStyle = rgba('#4af0c4', 0.25); ctx.lineWidth = 1.5; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 12. EPIGLOTTIS
+  // ═══════════════════════════════════════════════════
+  ctx.beginPath();
+  ctx.moveTo(X(0.15), Y(0.78));
+  ctx.bezierCurveTo(X(0.17), Y(0.76), X(0.20), Y(0.76), X(0.22), Y(0.78));
+  ctx.bezierCurveTo(X(0.22), Y(0.81), X(0.18), Y(0.83), X(0.15), Y(0.82));
+  ctx.fillStyle = '#2a2030'; ctx.fill();
+  ctx.strokeStyle = '#4a3050'; ctx.lineWidth = 1; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 13. LARYNX BOX
+  // ═══════════════════════════════════════════════════
+  const larynxY = Y(0.82);
+  ctx.beginPath();
+  ctx.moveTo(X(0.08), larynxY);
+  ctx.lineTo(X(0.22), larynxY);
+  ctx.lineTo(X(0.22), Y(0.97));
+  ctx.lineTo(X(0.08), Y(0.97));
+  ctx.closePath();
+  ctx.fillStyle = '#0d1820'; ctx.fill();
+  ctx.strokeStyle = rgba(C.larynx, 0.5); ctx.lineWidth = 1.5; ctx.stroke();
+  // Thyroid cartilage chevron
+  ctx.beginPath();
+  ctx.moveTo(X(0.08), Y(0.85));
+  ctx.lineTo(X(0.15), Y(0.83));
+  ctx.lineTo(X(0.22), Y(0.85));
+  ctx.strokeStyle = rgba(C.larynx, 0.4); ctx.lineWidth = 1; ctx.stroke();
+
+  // ═══════════════════════════════════════════════════
+  // 14. VOCAL FOLDS (animated, seen from side)
+  // ═══════════════════════════════════════════════════
+  const foldY2   = Y(0.88);
+  const foldOpen = 2 * S * 0.012 * Math.abs(foldOsc) + S * 0.005;
+  // Upper fold
+  ctx.beginPath();
+  ctx.moveTo(X(0.09), foldY2 - foldOpen);
+  ctx.bezierCurveTo(X(0.13), foldY2 - foldOpen - S*0.01, X(0.18), foldY2 - foldOpen, X(0.21), foldY2 - foldOpen);
+  ctx.strokeStyle = C.vocal; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 8; ctx.shadowColor = C.vocal; ctx.stroke(); ctx.shadowBlur = 0;
+  // Lower fold
+  ctx.beginPath();
+  ctx.moveTo(X(0.09), foldY2 + foldOpen);
+  ctx.bezierCurveTo(X(0.13), foldY2 + foldOpen + S*0.01, X(0.18), foldY2 + foldOpen, X(0.21), foldY2 + foldOpen);
+  ctx.strokeStyle = C.vocal; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 8; ctx.shadowColor = C.vocal; ctx.stroke(); ctx.shadowBlur = 0;
+  // Glottal opening fill
+  if (foldOpen > S*0.006) {
+    ctx.beginPath();
+    ctx.rect(X(0.09), foldY2 - foldOpen, S*0.12, foldOpen*2);
+    ctx.fillStyle = rgba(C.vocal, 0.15); ctx.fill();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 15. TRACHEA
+  // ═══════════════════════════════════════════════════
+  const trTop = Y(0.97), trBot = Y(1.30);
+  ctx.beginPath();
+  ctx.moveTo(X(0.09), trTop); ctx.lineTo(X(0.09), trBot);
+  ctx.moveTo(X(0.21), trTop); ctx.lineTo(X(0.21), trBot);
+  ctx.strokeStyle = rgba(C.trachea, 0.5); ctx.lineWidth = 1.5; ctx.stroke();
+  // Tracheal rings
+  for (let i = 0; i < 6; i++) {
+    const ry = trTop + (i+0.5) * (trBot-trTop)/6;
+    ctx.beginPath();
+    ctx.moveTo(X(0.09), ry); ctx.lineTo(X(0.21), ry);
+    ctx.strokeStyle = rgba(C.trachea, 0.2); ctx.lineWidth = 1; ctx.stroke();
+  }
+  // Trachea air (animated)
+  const trailY = trTop + ((t * 0.04 * state.pitch/120) % 1) * (trBot - trTop);
+  ctx.beginPath(); ctx.arc((X(0.09)+X(0.21))/2, trailY, 2.5, 0, Math.PI*2);
+  ctx.fillStyle = rgba(C.trachea, pressureFlow * 0.8); ctx.fill();
+
+  // ═══════════════════════════════════════════════════
+  // 16. LUNGS (with breathing animation)
+  // ═══════════════════════════════════════════════════
+  const lungExpand = breathAmp * S * 0.015 * state.volume;
+  const lungAlpha  = 0.12 + Math.abs(breathAmp) * 0.12;
+  const lungY      = Y(1.35);
+
+  // Left lung
+  ctx.beginPath();
+  ctx.moveTo(X(0.15), Y(1.22));
+  ctx.bezierCurveTo(
+    X(0.06) - lungExpand, Y(1.22),
+    X(0.03) - lungExpand, Y(1.38),
+    X(0.05) - lungExpand, Y(1.52)
+  );
+  ctx.bezierCurveTo(
+    X(0.06) - lungExpand, Y(1.60),
+    X(0.12), Y(1.62),
+    X(0.15), Y(1.58)
+  );
+  ctx.bezierCurveTo(X(0.17), Y(1.55), X(0.15), Y(1.40), X(0.15), Y(1.22));
+  ctx.fillStyle = rgba(C.lung, lungAlpha); ctx.fill();
+  ctx.strokeStyle = rgba(C.lung, 0.4); ctx.lineWidth = 1.2; ctx.stroke();
+
+  // Right lung
+  ctx.beginPath();
+  ctx.moveTo(X(0.15), Y(1.22));
+  ctx.bezierCurveTo(
+    X(0.24) + lungExpand, Y(1.22),
+    X(0.27) + lungExpand, Y(1.38),
+    X(0.25) + lungExpand, Y(1.52)
+  );
+  ctx.bezierCurveTo(
+    X(0.24) + lungExpand, Y(1.60),
+    X(0.18), Y(1.62),
+    X(0.15), Y(1.58)
+  );
+  ctx.bezierCurveTo(X(0.13), Y(1.55), X(0.15), Y(1.40), X(0.15), Y(1.22));
+  ctx.fillStyle = rgba(C.lung, lungAlpha); ctx.fill();
+  ctx.strokeStyle = rgba(C.lung, 0.4); ctx.lineWidth = 1.2; ctx.stroke();
+
+  // Lung glow rings when breathing out (voicing)
+  if (state.volume > 0.2) {
+    for (let ring = 1; ring <= 2; ring++) {
+      const rAlpha = (0.18 - ring * 0.06) * Math.abs(breathAmp) * state.volume;
+      ctx.beginPath();
+      ctx.ellipse(X(0.15), Y(1.42), S*(0.12+ring*0.06)+lungExpand, S*(0.2+ring*0.06)+lungExpand, 0, 0, Math.PI*2);
+      ctx.strokeStyle = rgba(C.lung, rAlpha); ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 17. AIRFLOW PARTICLES (lungs → vocal folds → mouth)
+  // ═══════════════════════════════════════════════════
+  const nParticles = 5;
+  for (let i = 0; i < nParticles; i++) {
+    const phase = ((t * 0.03 * (state.pitch/120) + i/nParticles) % 1);
+    const alpha = Math.sin(phase * Math.PI) * state.volume * 0.8;
+    if (alpha < 0.05) continue;
+
+    let px, py;
+    if (phase < 0.35) {
+      // Trachea: bottom to larynx
+      const p = phase / 0.35;
+      px = (X(0.09)+X(0.21))/2;
+      py = trBot - p*(trBot - trTop);
+    } else if (phase < 0.60) {
+      // Through vocal folds into pharynx
+      const p = (phase-0.35)/0.25;
+      px = (X(0.09)+X(0.21))/2;
+      py = trTop - p*(trTop - Y(0.66));
+    } else {
+      // Oral cavity to lips
+      const p = (phase-0.60)/0.40;
+      px = X(0.15 + p*(0.45 - 0.15*(1-tPos)));
+      py = Y(0.54 + (1-tPos)*0.04);
+    }
+
+    ctx.beginPath(); ctx.arc(px, py, 2.2, 0, Math.PI*2);
+    ctx.fillStyle = rgba(C.vocal, alpha * 0.9); ctx.fill();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 18. CERVICAL SPINE (back of neck)
+  // ═══════════════════════════════════════════════════
+  for (let i = 0; i < 5; i++) {
+    const vy = Y(0.60 + i * 0.10);
+    ctx.beginPath();
+    ctx.rect(X(0.08), vy, S*0.04, S*0.07);
+    ctx.fillStyle = C.bone; ctx.fill();
+    ctx.strokeStyle = C.boneStr; ctx.lineWidth = 0.8; ctx.stroke();
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 19. ANNOTATION LABELS (right side)
+  // ═══════════════════════════════════════════════════
+  ctx.textAlign = 'left';
+  const lx0 = w * 0.72;
+
+  // Draw annotation lines and labels
+  const annotations = [
+    { x: X(0.48), y: Y(0.38),  color: C.nasal,   name: 'Nasal Cavity',   desc: state.vowel==='hum' ? 'active resonator' : 'sinus resonance' },
+    { x: X(0.50), y: Y(0.51),  color: C.oral,     name: 'Hard Palate',    desc: 'roof of mouth' },
+    { x: X(0.45), y: Y(0.54 - tPos*0.05), color: '#c06070', name: 'Tongue',  desc: tPos < 0.33 ? 'low position' : tPos < 0.66 ? 'mid position' : 'high position' },
+    { x: X(0.22), y: Y(0.58),  color: C.softStr,  name: 'Soft Palate',    desc: 'velum + uvula' },
+    { x: X(0.13), y: Y(0.66),  color: C.pharynx,  name: 'Pharynx',        desc: 'F1/F2 resonator' },
+    { x: X(0.16), y: foldY2,   color: C.vocal,    name: 'Vocal Folds',    desc: state.pitch + 'Hz buzz' },
+    { x: X(0.15), y: Y(1.00),  color: C.trachea,  name: 'Trachea',        desc: 'air column' },
+    { x: X(0.06), y: Y(1.40),  color: C.lung,     name: 'Lungs',          desc: 'pressure source' },
+  ];
+
+  annotations.forEach((a, i) => {
+    const ly = Math.max(a.y, Y(0.28) + i * 22);
+    // Leader line
+    ctx.strokeStyle = rgba(a.color, 0.25); ctx.lineWidth = 0.7;
+    ctx.setLineDash([2,3]);
+    ctx.beginPath();
+    ctx.moveTo(a.x + 4, a.y);
+    ctx.lineTo(lx0 - 4, ly);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Dot on anatomy
+    ctx.beginPath(); ctx.arc(a.x, a.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = a.color; ctx.fill();
+    // Text
+    ctx.fillStyle = a.color; ctx.font = 'bold 8.5px Space Mono,monospace';
+    ctx.fillText(a.name, lx0, ly - 1);
+    ctx.fillStyle = '#3a5060'; ctx.font = '7px Space Mono,monospace';
+    ctx.fillText(a.desc, lx0, ly + 9);
   });
+
+  // Title
+  ctx.fillStyle = '#3a5060'; ctx.font = '7px Space Mono,monospace';
+  ctx.fillText('SAGITTAL CROSS-SECTION', w * 0.72, h * 0.94);
+  ctx.fillText('(right-facing view)', w * 0.72, h * 0.94 + 11);
+
+  // Breath indicator
+  const breathLabel = breathAmp > 0 ? 'exhaling' : 'inhaling';
+  ctx.fillStyle = rgba(C.lung, 0.5 + Math.abs(breathAmp)*0.5);
+  ctx.font = '7.5px Space Mono,monospace';
+  ctx.fillText('● ' + breathLabel, w * 0.72, h * 0.87);
 }
 
 function draw() {
