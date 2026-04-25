@@ -527,6 +527,15 @@ const physicsHTML = `
     <br><br>
     Air itself barely moves. A single air molecule just oscillates back and forth around its resting position by a fraction of a millimeter. The "wave" is just the pattern of that oscillation spreading outward at ~343 m/s (the speed of sound in air at room temperature).
   </div>
+
+  <!-- DIAGRAM: Compression wave with animated molecules -->
+  <canvas id="waveParticleCanvas" class="wave-mini-canvas" style="height:110px;margin:14px 0;"></canvas>
+  <div style="display:flex;justify-content:center;gap:28px;font-size:0.58rem;color:#5a6a7a;margin-bottom:10px;">
+    <span><span style="color:#4af0c4">■</span> Compression (high pressure)</span>
+    <span><span style="color:#f06050">■</span> Rarefaction (low pressure)</span>
+    <span style="color:#7090ff">→ Wave travels this way</span>
+  </div>
+
   <div class="phys-analogy">Think of a stadium "wave" — no person travels around the stadium, but the wave does. Sound works exactly like that, except the "people" are air molecules and the wave is invisible.</div>
 </div>
 
@@ -540,6 +549,14 @@ const physicsHTML = `
     <br><br>
     So "high pitch" = <strong>fast oscillation</strong> = more cycles per second = specific hair cells activated. It is entirely a physical + biological mapping. There is nothing inherently "high" about a high-pitched sound — it is just faster.
   </div>
+
+  <!-- DIAGRAM: Two sine waves, low vs high frequency -->
+  <canvas id="freqCompareCanvas" class="wave-mini-canvas" style="height:130px;margin:14px 0;"></canvas>
+  <div style="display:flex;justify-content:center;gap:28px;font-size:0.58rem;color:#5a6a7a;margin-bottom:10px;">
+    <span><span style="color:#f0c040">—</span> Low frequency (100 Hz, deep voice)</span>
+    <span><span style="color:#4af0c4">—</span> High frequency (400 Hz, high voice)</span>
+  </div>
+
   <div class="phys-analogy">A hummingbird flaps its wings ~80 times/second (you hear a buzz). A bee ~200 times/second (higher buzz). A mosquito ~600 times/second (even higher whine). Same physics — just faster oscillation = higher pitch perceived.</div>
 </div>
 
@@ -555,6 +572,10 @@ const physicsHTML = `
     <br><br>
     This matters enormously for vocal resonance: your vocal tract is roughly 17 cm long, which means it naturally resonates at frequencies whose wavelengths fit as <strong>standing waves</strong> inside it — typically in the range of 500–3000 Hz.
   </div>
+
+  <!-- DIAGRAM: Wavelength ruler comparison -->
+  <canvas id="wavelengthCanvas" class="wave-mini-canvas" style="height:140px;margin:14px 0;"></canvas>
+
   <div class="phys-analogy">A guitar string 65 cm long only resonates at notes whose wavelengths "fit" on it. Your vocal tract is the same — a tube that picks its own favorite frequencies.</div>
 </div>
 
@@ -569,6 +590,14 @@ const physicsHTML = `
     <br><br>
     At other frequencies, the reflections arrive out of sync, cancel each other out, and the sound dies quickly. Resonance is therefore a <strong>natural filter</strong> — it dramatically amplifies certain frequencies and suppresses others.
   </div>
+
+  <!-- DIAGRAM: Resonance buildup — in sync vs out of sync -->
+  <canvas id="resonanceCanvas" class="wave-mini-canvas" style="height:150px;margin:14px 0;"></canvas>
+  <div style="display:flex;justify-content:center;gap:28px;font-size:0.58rem;color:#5a6a7a;margin-bottom:10px;">
+    <span><span style="color:#4af0c4">—</span> In sync → AMPLIFIES (resonance)</span>
+    <span><span style="color:#f06050">—</span> Out of sync → cancels out</span>
+  </div>
+
   <div class="phys-analogy">Pushing a child on a swing: if you push at exactly the right moment (the swing's natural frequency), energy builds up and the swing goes higher and higher. Push at the wrong moment and you fight against it. Resonance is that "exactly right moment" for sound waves.</div>
 </div>
 
@@ -578,6 +607,10 @@ const physicsHTML = `
   <div class="phys-body">
     When resonance occurs, the ongoing and reflected waves combine to create a <strong>standing wave</strong>: a pattern that appears frozen in space. It has two characteristic features:
   </div>
+
+  <!-- DIAGRAM: Standing wave in tube with labeled nodes/antinodes -->
+  <canvas id="standingWaveCanvas" class="wave-mini-canvas" style="height:160px;margin:14px 0;"></canvas>
+
   <div class="concept-grid">
     <div class="concept-card">
       <div class="card-term" style="color:#4af0c4">● Pressure Antinode</div>
@@ -611,6 +644,11 @@ const physicsHTML = `
     <br><br>
     <strong>F3 and above</strong> — Shape voice timbre and speaker identity. F3 interacts with F2 in ways that give voices their characteristic "brightness" or "nasality."
   </div>
+
+  <!-- DIAGRAM: Vowel formant space (F1 vs F2 chart) -->
+  <canvas id="vowelSpaceCanvas" class="wave-mini-canvas" style="height:220px;margin:14px 0;"></canvas>
+  <div style="text-align:center;font-size:0.58rem;color:#5a6a7a;margin-bottom:10px;">Vowel space: each vowel occupies a unique F1/F2 coordinate — this is why linguists can identify vowels from their physics alone</div>
+
   <div class="phys-analogy">Think of formants as equalizer bands that are built into your anatomy. Every time you move your tongue or jaw, you're physically retuning those bands — live, in real time — changing which harmonics get amplified.</div>
 </div>
 
@@ -624,6 +662,15 @@ const physicsHTML = `
     <br><br>
     Shown in <strong style="color:#f0c040">gold</strong> in the spectrum view — the taller the peak, the stronger that resonance, the more that frequency range dominates your sound.
   </div>
+
+  <!-- DIAGRAM: Spectrum with formant envelope -->
+  <canvas id="formantSpecCanvas" class="wave-mini-canvas" style="height:160px;margin:14px 0;"></canvas>
+  <div style="display:flex;justify-content:center;gap:28px;font-size:0.58rem;color:#5a6a7a;margin-bottom:10px;">
+    <span><span style="color:#3a5a6a">■</span> Raw harmonics from vocal folds</span>
+    <span><span style="color:#f0c040">—</span> Formant envelope (vocal tract filter)</span>
+    <span><span style="color:#4af0c4">■</span> Amplified harmonics you hear</span>
+  </div>
+
   <div class="phys-analogy">A wine glass resonates at one precise frequency (its "ring"). If you fill it with water, the resonance shifts lower and broadens — less perfect, more lossy. Your vocal tract is like a wet, leaky wine glass that you reshape 10 times per second.</div>
 </div>
 
@@ -641,11 +688,498 @@ const physicsHTML = `
     <br><br>
     Every vowel you produce is a unique <strong>F1/F2 coordinate</strong> in acoustic space. Linguists literally plot vowels on an F1 vs. F2 graph — and the positions are remarkably consistent across all speakers of a language, because the physics of the vocal tract is universal.
   </div>
+
+  <!-- DIAGRAM: Signal chain flowchart -->
+  <canvas id="signalChainCanvas" class="wave-mini-canvas" style="height:90px;margin:14px 0;"></canvas>
   <div class="phys-analogy">Your voice is a wind instrument you carry inside your body, tunable in real time by muscles you've been practicing since you were a baby learning to speak.</div>
 </div>
 `;
 
 document.getElementById('physicsPanel').innerHTML = physicsHTML;
+
+// ===== PHYSICS DIAGRAMS =====
+let physicsAnimFrames = [];
+let physicsAnimating = false;
+
+function stopPhysicsAnims() {
+  physicsAnimating = false;
+  physicsAnimFrames.forEach(id => cancelAnimationFrame(id));
+  physicsAnimFrames = [];
+}
+
+function startPhysicsAnims() {
+  physicsAnimating = true;
+  let pt = 0;
+
+  // ---- 1. Particle wave diagram ----
+  const pwc = document.getElementById('waveParticleCanvas');
+  if (pwc) {
+    pwc.width = pwc.offsetWidth * devicePixelRatio;
+    pwc.height = pwc.offsetHeight * devicePixelRatio;
+    const pc = pwc.getContext('2d');
+    pc.scale(devicePixelRatio, devicePixelRatio);
+    const PW = pwc.offsetWidth, PH = pwc.offsetHeight;
+    const ROWS = 4, COLS = 28;
+    const dots = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+      dots.push({ bx: (c+0.5)*(PW/COLS), by: (r+0.5)*(PH/ROWS), r, c });
+
+    function drawParticles() {
+      if (!physicsAnimating) return;
+      pc.clearRect(0,0,PW,PH);
+      // background
+      pc.fillStyle = '#0d1318'; pc.fillRect(0,0,PW,PH);
+      const speed = 0.035;
+      dots.forEach(d => {
+        const phase = d.c / COLS * Math.PI * 4 - pt * speed * 3;
+        const disp = Math.sin(phase) * 6;
+        const pressure = Math.sin(phase);
+        const r = Math.max(0, pressure), b = Math.max(0, -pressure);
+        const col = pressure > 0
+          ? `rgba(74,240,196,${0.4+r*0.6})`
+          : `rgba(240,96,80,${0.3+b*0.7})`;
+        pc.beginPath();
+        pc.arc(d.bx + disp, d.by, 3.5, 0, Math.PI*2);
+        pc.fillStyle = col;
+        pc.fill();
+      });
+      // arrow
+      const arrowX = PW * 0.85;
+      pc.fillStyle = '#7090ff';
+      pc.font = '11px Space Mono,monospace';
+      pc.fillText('→ wave', arrowX - 28, PH - 6);
+      // labels
+      pc.fillStyle = '#3a5a7a'; pc.font = '9px Space Mono,monospace';
+      pc.fillText('compression', PW*0.15, PH-6);
+      pc.fillText('rarefaction', PW*0.42, PH-6);
+      pt++;
+      physicsAnimFrames.push(requestAnimationFrame(drawParticles));
+    }
+    drawParticles();
+  }
+
+  // ---- 2. Frequency compare ----
+  const fcc = document.getElementById('freqCompareCanvas');
+  if (fcc) {
+    fcc.width = fcc.offsetWidth * devicePixelRatio;
+    fcc.height = fcc.offsetHeight * devicePixelRatio;
+    const fc = fcc.getContext('2d');
+    fc.scale(devicePixelRatio, devicePixelRatio);
+    const FW = fcc.offsetWidth, FH = fcc.offsetHeight;
+    let ft = 0;
+    function drawFreqCompare() {
+      if (!physicsAnimating) return;
+      fc.fillStyle = '#0d1318'; fc.fillRect(0,0,FW,FH);
+      const midTop = FH * 0.28, midBot = FH * 0.72;
+      // Labels
+      fc.fillStyle = '#f0c040'; fc.font = 'bold 9px Space Mono,monospace';
+      fc.fillText('100 Hz — deep, slow', 8, 11);
+      fc.fillStyle = '#4af0c4';
+      fc.fillText('400 Hz — high, fast', 8, FH*0.5+11);
+      // Low freq wave
+      fc.beginPath();
+      for (let x=0; x<=FW; x++) {
+        const phase = (x/FW)*Math.PI*4 - ft*0.025;
+        const y = midTop + Math.sin(phase) * (FH*0.18);
+        x===0 ? fc.moveTo(x,y) : fc.lineTo(x,y);
+      }
+      fc.strokeStyle='#f0c040'; fc.lineWidth=2.5;
+      fc.shadowBlur=6; fc.shadowColor='#f0c040'; fc.stroke(); fc.shadowBlur=0;
+      // High freq wave
+      fc.beginPath();
+      for (let x=0; x<=FW; x++) {
+        const phase = (x/FW)*Math.PI*16 - ft*0.1;
+        const y = midBot + Math.sin(phase) * (FH*0.18);
+        x===0 ? fc.moveTo(x,y) : fc.lineTo(x,y);
+      }
+      fc.strokeStyle='#4af0c4'; fc.lineWidth=2.5;
+      fc.shadowBlur=6; fc.shadowColor='#4af0c4'; fc.stroke(); fc.shadowBlur=0;
+      // divider
+      fc.strokeStyle='#1e2530'; fc.lineWidth=1;
+      fc.beginPath(); fc.moveTo(0,FH*0.5); fc.lineTo(FW,FH*0.5); fc.stroke();
+      ft++;
+      physicsAnimFrames.push(requestAnimationFrame(drawFreqCompare));
+    }
+    drawFreqCompare();
+  }
+
+  // ---- 3. Wavelength ruler ----
+  const wlc = document.getElementById('wavelengthCanvas');
+  if (wlc) {
+    wlc.width = wlc.offsetWidth * devicePixelRatio;
+    wlc.height = wlc.offsetHeight * devicePixelRatio;
+    const wc = wlc.getContext('2d');
+    wc.scale(devicePixelRatio, devicePixelRatio);
+    const WW = wlc.offsetWidth, WH = wlc.offsetHeight;
+    // Static diagram — wavelength bars
+    wc.fillStyle = '#0d1318'; wc.fillRect(0,0,WW,WH);
+    const waves = [
+      { label:'100 Hz  (λ = 3.4 m)', cycles:0.5, color:'#f06050', note:'deep voice', y:0.18 },
+      { label:'1000 Hz (λ = 34 cm)', cycles:4,   color:'#f0c040', note:'vocal tract resonance', y:0.50 },
+      { label:'5000 Hz (λ = 7 cm)',  cycles:18,  color:'#4af0c4', note:'high overtone', y:0.82 },
+    ];
+    const margin = 8;
+    waves.forEach(w => {
+      const y = WH * w.y;
+      const amp = WH * 0.10;
+      wc.beginPath();
+      for (let x=margin; x<=WW-margin; x++) {
+        const phase = ((x-margin)/(WW-2*margin)) * Math.PI * 2 * w.cycles;
+        const py = y + Math.sin(phase) * amp;
+        x===margin ? wc.moveTo(x,py) : wc.lineTo(x,py);
+      }
+      wc.strokeStyle = w.color; wc.lineWidth = 2;
+      wc.shadowBlur=5; wc.shadowColor=w.color; wc.stroke(); wc.shadowBlur=0;
+      // Label
+      wc.fillStyle = w.color; wc.font = 'bold 8px Space Mono,monospace';
+      wc.fillText(w.label, margin+2, y - amp - 3);
+      wc.fillStyle='#3a4a5a'; wc.font='8px Space Mono,monospace';
+      wc.fillText('← '+w.note, WW*0.6, y - amp - 3);
+    });
+    // Vocal tract marker
+    const tractW = (17/343) * (WW-2*margin) * waves[1].cycles * 2;
+    const tractX = margin;
+    wc.fillStyle='rgba(112,144,255,0.15)';
+    wc.fillRect(tractX, WH*0.38, tractW*2.2, WH*0.24);
+    wc.strokeStyle='#7090ff'; wc.lineWidth=1; wc.setLineDash([3,3]);
+    wc.strokeRect(tractX, WH*0.38, tractW*2.2, WH*0.24);
+    wc.setLineDash([]);
+    wc.fillStyle='#7090ff'; wc.font='8px Space Mono,monospace';
+    wc.fillText('← your vocal tract (~17cm) →', tractX+4, WH*0.38+10);
+  }
+
+  // ---- 4. Resonance: in-sync vs out-of-sync ----
+  const resc = document.getElementById('resonanceCanvas');
+  if (resc) {
+    resc.width = resc.offsetWidth * devicePixelRatio;
+    resc.height = resc.offsetHeight * devicePixelRatio;
+    const rc = resc.getContext('2d');
+    rc.scale(devicePixelRatio, devicePixelRatio);
+    const RW = resc.offsetWidth, RH = resc.offsetHeight;
+    let rt = 0;
+    function drawResonance() {
+      if (!physicsAnimating) return;
+      rc.fillStyle='#0d1318'; rc.fillRect(0,0,RW,RH);
+      const half = RW/2 - 4;
+      const midY1 = RH*0.28, midY2 = RH*0.72;
+
+      // --- IN SYNC (left panel, top) ---
+      rc.fillStyle='#0f2820'; rc.fillRect(4, 4, half-8, RH*0.44);
+      rc.strokeStyle='#1e4030'; rc.lineWidth=1; rc.strokeRect(4, 4, half-8, RH*0.44);
+      rc.fillStyle='#4af0c4'; rc.font='bold 8px Space Mono,monospace';
+      rc.fillText('IN SYNC → amplifies', 10, 16);
+
+      // two in-phase waves and their sum
+      const amp1 = RH*0.1;
+      const growth = 1 + (rt % 120) / 80;
+      for (let wi=0; wi<2; wi++) {
+        rc.beginPath();
+        for (let x=10; x<half-4; x++) {
+          const phase = (x-10)/(half-14)*Math.PI*3 - rt*0.04;
+          const y = midY1 + Math.sin(phase)*amp1*(wi===0?0.6:0.6);
+          x===10?rc.moveTo(x,y):rc.lineTo(x,y);
+        }
+        rc.strokeStyle=`rgba(74,240,196,0.35)`; rc.lineWidth=1.5; rc.stroke();
+      }
+      // sum wave (bigger)
+      rc.beginPath();
+      for (let x=10; x<half-4; x++) {
+        const phase = (x-10)/(half-14)*Math.PI*3 - rt*0.04;
+        const y = midY1 + Math.sin(phase)*amp1*Math.min(growth, 2.5);
+        x===10?rc.moveTo(x,y):rc.lineTo(x,y);
+      }
+      rc.strokeStyle='#4af0c4'; rc.lineWidth=2.5;
+      rc.shadowBlur=8; rc.shadowColor='#4af0c4'; rc.stroke(); rc.shadowBlur=0;
+
+      // --- OUT OF SYNC (left panel, bottom) ---
+      rc.fillStyle='#1a0f0f'; rc.fillRect(4, RH*0.52, half-8, RH*0.44);
+      rc.strokeStyle='#3a1a1a'; rc.lineWidth=1; rc.strokeRect(4, RH*0.52, half-8, RH*0.44);
+      rc.fillStyle='#f06050'; rc.font='bold 8px Space Mono,monospace';
+      rc.fillText('OUT OF SYNC → cancels', 10, RH*0.52+12);
+
+      // two out-of-phase waves
+      for (let wi=0; wi<2; wi++) {
+        rc.beginPath();
+        for (let x=10; x<half-4; x++) {
+          const phase = (x-10)/(half-14)*Math.PI*3 - rt*0.04 + (wi===1?Math.PI*0.8:0);
+          const y = midY2 + Math.sin(phase)*amp1*0.7;
+          x===10?rc.moveTo(x,y):rc.lineTo(x,y);
+        }
+        rc.strokeStyle=`rgba(240,96,80,0.5)`; rc.lineWidth=1.5; rc.stroke();
+      }
+      // near-cancelled sum
+      rc.beginPath();
+      for (let x=10; x<half-4; x++) {
+        const phase = (x-10)/(half-14)*Math.PI*3 - rt*0.04;
+        const y = midY2 + Math.sin(phase)*amp1*0.1;
+        x===10?rc.moveTo(x,y):rc.lineTo(x,y);
+      }
+      rc.strokeStyle='#f06050'; rc.lineWidth=2; rc.stroke();
+
+      rt++;
+      physicsAnimFrames.push(requestAnimationFrame(drawResonance));
+    }
+    drawResonance();
+  }
+
+  // ---- 5. Standing wave with labeled nodes/antinodes ----
+  const swc = document.getElementById('standingWaveCanvas');
+  if (swc) {
+    swc.width = swc.offsetWidth * devicePixelRatio;
+    swc.height = swc.offsetHeight * devicePixelRatio;
+    const sc = swc.getContext('2d');
+    sc.scale(devicePixelRatio, devicePixelRatio);
+    const SW = swc.offsetWidth, SH = swc.offsetHeight;
+    let st = 0;
+    function drawStandingWave() {
+      if (!physicsAnimating) return;
+      sc.fillStyle='#0d1318'; sc.fillRect(0,0,SW,SH);
+      const margin = 24;
+      const tubeY = SH*0.5, tubeH = SH*0.28;
+      // tube walls
+      sc.fillStyle='#0a1520';
+      sc.fillRect(margin, tubeY-tubeH, SW-2*margin, tubeH*2);
+      sc.strokeStyle='#2a3a4a'; sc.lineWidth=1.5;
+      sc.strokeRect(margin, tubeY-tubeH, SW-2*margin, tubeH*2);
+      // closed end (left = vocal folds)
+      sc.fillStyle='#7090ff';
+      sc.fillRect(margin-3, tubeY-tubeH-2, 4, tubeH*2+4);
+      sc.fillStyle='#5a70cc'; sc.font='8px Space Mono,monospace';
+      sc.fillText('CLOSED', margin+2, tubeY+tubeH+13);
+      sc.fillText('(vocal folds)', margin+2, tubeY+tubeH+22);
+      // open end (right = lips)
+      sc.strokeStyle='#4af0c4'; sc.lineWidth=1;
+      sc.beginPath(); sc.moveTo(SW-margin, tubeY-tubeH); sc.lineTo(SW-margin, tubeY+tubeH); sc.stroke();
+      sc.fillStyle='#4af0c4'; sc.font='8px Space Mono,monospace';
+      sc.fillText('OPEN', SW-margin-28, tubeY+tubeH+13);
+      sc.fillText('(lips)', SW-margin-18, tubeY+tubeH+22);
+      // standing wave (first mode: quarter wave)
+      const timeOsc = Math.cos(st * 0.06);
+      sc.beginPath();
+      for (let x=margin; x<=SW-margin; x++) {
+        const xn = (x-margin)/(SW-2*margin);
+        const pressure = Math.cos(xn*Math.PI/2) * timeOsc;
+        const y = tubeY - pressure*tubeH*0.85;
+        x===margin?sc.moveTo(x,y):sc.lineTo(x,y);
+      }
+      sc.strokeStyle='#4af0c4'; sc.lineWidth=2.5;
+      sc.shadowBlur=8; sc.shadowColor='#4af0c4'; sc.stroke(); sc.shadowBlur=0;
+      // Antinode marker (left/closed end)
+      sc.beginPath(); sc.arc(margin, tubeY, 6, 0, Math.PI*2);
+      sc.fillStyle='#4af0c4'; sc.fill();
+      sc.fillStyle='#4af0c4'; sc.font='bold 8px Space Mono,monospace';
+      sc.fillText('ANTINODE', margin+10, tubeY-tubeH+12);
+      sc.fillText('max pressure', margin+10, tubeY-tubeH+22);
+      // Node marker (right/open end)
+      sc.beginPath(); sc.arc(SW-margin, tubeY, 6, 0, Math.PI*2);
+      sc.fillStyle='#f06050'; sc.fill();
+      sc.fillStyle='#f06050'; sc.font='bold 8px Space Mono,monospace';
+      sc.fillText('NODE', SW-margin-52, tubeY-tubeH+12);
+      sc.fillText('zero pressure', SW-margin-68, tubeY-tubeH+22);
+      // quarter wavelength brace
+      sc.strokeStyle='#3a4a5a'; sc.lineWidth=1; sc.setLineDash([3,3]);
+      sc.beginPath(); sc.moveTo(margin,tubeY-tubeH-6); sc.lineTo(SW-margin,tubeY-tubeH-6); sc.stroke();
+      sc.setLineDash([]);
+      sc.fillStyle='#3a4a5a'; sc.font='8px Space Mono,monospace';
+      const midX = (margin + SW-margin)/2;
+      sc.fillText('← ¼ wavelength →', midX-42, tubeY-tubeH-8);
+      st++;
+      physicsAnimFrames.push(requestAnimationFrame(drawStandingWave));
+    }
+    drawStandingWave();
+  }
+
+  // ---- 6. Vowel space F1 vs F2 chart ----
+  const vsc = document.getElementById('vowelSpaceCanvas');
+  if (vsc) {
+    vsc.width = vsc.offsetWidth * devicePixelRatio;
+    vsc.height = vsc.offsetHeight * devicePixelRatio;
+    const vc = vsc.getContext('2d');
+    vc.scale(devicePixelRatio, devicePixelRatio);
+    const VW = vsc.offsetWidth, VH = vsc.offsetHeight;
+    vc.fillStyle='#0d1318'; vc.fillRect(0,0,VW,VH);
+    const margin = 36;
+    // Axes
+    vc.strokeStyle='#2a3a4a'; vc.lineWidth=1;
+    vc.beginPath(); vc.moveTo(margin,10); vc.lineTo(margin,VH-margin); vc.lineTo(VW-10,VH-margin); vc.stroke();
+    // Axis labels
+    vc.fillStyle='#5a6a7a'; vc.font='8px Space Mono,monospace';
+    vc.fillText('F1 (Hz) — mouth opening', margin, VH-4);
+    vc.save(); vc.translate(10, VH/2); vc.rotate(-Math.PI/2);
+    vc.fillText('F2 (Hz) — tongue front/back', -40, 0); vc.restore();
+    // F1 axis: 200 (top) to 900 (bottom)
+    // F2 axis: 2500 (left) to 600 (right)
+    const F1min=200,F1max=900,F2min=600,F2max=2500;
+    function toX(f2){ return margin + (1-(f2-F2min)/(F2max-F2min))*(VW-margin-14); }
+    function toY(f1){ return 14 + (f1-F1min)/(F1max-F1min)*(VH-margin-14); }
+    // Tick labels
+    [300,500,700,900].forEach(f1=>{
+      const y=toY(f1);
+      vc.fillStyle='#3a4a5a'; vc.font='7px Space Mono,monospace';
+      vc.fillText(f1,4,y+3);
+      vc.strokeStyle='#1e2530'; vc.lineWidth=0.5;
+      vc.beginPath(); vc.moveTo(margin,y); vc.lineTo(VW-10,y); vc.stroke();
+    });
+    [800,1200,1600,2000,2400].forEach(f2=>{
+      const x=toX(f2);
+      vc.fillStyle='#3a4a5a'; vc.font='7px Space Mono,monospace';
+      vc.fillText(f2,x-12,VH-margin+10);
+      vc.strokeStyle='#1e2530'; vc.lineWidth=0.5;
+      vc.beginPath(); vc.moveTo(x,10); vc.lineTo(x,VH-margin); vc.stroke();
+    });
+    // Vowels
+    const vdata = [
+      { v:'A', f1:750, f2:1200, color:'#f0c040' },
+      { v:'E', f1:480, f2:1800, color:'#4af0c4' },
+      { v:'I', f1:280, f2:2300, color:'#7090ff' },
+      { v:'O', f1:500, f2:900,  color:'#f06050' },
+      { v:'U', f1:310, f2:700,  color:'#e080ff' },
+    ];
+    // Draw connecting region
+    vc.beginPath();
+    vdata.forEach((d,i)=>{ const x=toX(d.f2),y=toY(d.f1); i===0?vc.moveTo(x,y):vc.lineTo(x,y); });
+    vc.closePath();
+    vc.fillStyle='rgba(74,240,196,0.05)'; vc.fill();
+    vc.strokeStyle='rgba(74,240,196,0.2)'; vc.lineWidth=1; vc.setLineDash([4,4]); vc.stroke(); vc.setLineDash([]);
+    // Plot vowel points
+    vdata.forEach(d => {
+      const x=toX(d.f2), y=toY(d.f1);
+      vc.beginPath(); vc.arc(x,y,8,0,Math.PI*2);
+      vc.fillStyle=d.color+'33'; vc.fill();
+      vc.beginPath(); vc.arc(x,y,8,0,Math.PI*2);
+      vc.strokeStyle=d.color; vc.lineWidth=2; vc.stroke();
+      vc.fillStyle=d.color; vc.font='bold 11px Fraunces,serif';
+      vc.fillText(d.v, x-4, y+4);
+      vc.fillStyle='#5a6a7a'; vc.font='7px Space Mono,monospace';
+      vc.fillText('F1:'+d.f1, x+12, y-2);
+      vc.fillText('F2:'+d.f2, x+12, y+8);
+    });
+  }
+
+  // ---- 7. Formant spectrum diagram ----
+  const fsc = document.getElementById('formantSpecCanvas');
+  if (fsc) {
+    fsc.width = fsc.offsetWidth * devicePixelRatio;
+    fsc.height = fsc.offsetHeight * devicePixelRatio;
+    const fc = fsc.getContext('2d');
+    fc.scale(devicePixelRatio, devicePixelRatio);
+    const FSW = fsc.offsetWidth, FSH = fsc.offsetHeight;
+    let fst = 0;
+    function drawFormantSpec() {
+      if (!physicsAnimating) return;
+      fc.fillStyle='#0d1318'; fc.fillRect(0,0,FSW,FSH);
+      const margin=30, topM=20;
+      const plotW=FSW-margin-10, plotH=FSH-topM-20;
+      const maxFreq=3200, pitch=120;
+      const F1=800, F2=1800;
+      // Formant envelope function
+      function envelope(freq) {
+        const d1=freq-F1, d2=freq-F2;
+        return Math.exp(-d1*d1/80000)*0.9 + Math.exp(-d2*d2/150000)*0.75;
+      }
+      // Draw each harmonic
+      for (let n=1; n*pitch<maxFreq; n++) {
+        const freq=n*pitch;
+        const x=margin+(freq/maxFreq)*plotW;
+        const env=envelope(freq);
+        const rawH=plotH*0.3;
+        const ampH=plotH*env;
+        // raw harmonic (dim)
+        fc.fillStyle='#2a4a5a';
+        fc.fillRect(x-2, topM+plotH-rawH, 4, rawH);
+        // amplified (colored by formant proximity)
+        const inF1=Math.abs(freq-F1)<300, inF2=Math.abs(freq-F2)<400;
+        const shimmer=0.7+0.3*Math.sin(fst*0.05+n);
+        if (inF1||inF2) {
+          fc.fillStyle=inF1?`rgba(74,240,196,${shimmer})`:`rgba(240,192,64,${shimmer})`;
+          fc.fillRect(x-2, topM+plotH-ampH, 4, ampH);
+        }
+      }
+      // Formant envelope curve
+      fc.beginPath();
+      for (let freq=0; freq<maxFreq; freq+=8) {
+        const x=margin+(freq/maxFreq)*plotW;
+        const env=envelope(freq);
+        const y=topM+plotH-env*plotH*0.92;
+        freq===0?fc.moveTo(x,y):fc.lineTo(x,y);
+      }
+      fc.strokeStyle='#f0c040'; fc.lineWidth=2;
+      fc.shadowBlur=8; fc.shadowColor='#f0c040'; fc.stroke(); fc.shadowBlur=0;
+      // F1/F2 labels
+      const f1x=margin+(F1/maxFreq)*plotW;
+      const f2x=margin+(F2/maxFreq)*plotW;
+      fc.strokeStyle='rgba(74,240,196,0.5)'; fc.lineWidth=1; fc.setLineDash([3,3]);
+      fc.beginPath(); fc.moveTo(f1x,topM); fc.lineTo(f1x,topM+plotH); fc.stroke();
+      fc.strokeStyle='rgba(240,192,64,0.5)';
+      fc.beginPath(); fc.moveTo(f2x,topM); fc.lineTo(f2x,topM+plotH); fc.stroke();
+      fc.setLineDash([]);
+      fc.fillStyle='#4af0c4'; fc.font='bold 9px Space Mono,monospace'; fc.fillText('F1',f1x+3,topM+10);
+      fc.fillStyle='#f0c040'; fc.font='bold 9px Space Mono,monospace'; fc.fillText('F2',f2x+3,topM+10);
+      // Axis
+      fc.fillStyle='#3a4a5a'; fc.font='8px Space Mono,monospace';
+      fc.fillText('0',margin-8,topM+plotH+12);
+      fc.fillText('1k',margin+(1000/maxFreq)*plotW-4,topM+plotH+12);
+      fc.fillText('2k',margin+(2000/maxFreq)*plotW-4,topM+plotH+12);
+      fc.fillText('3k Hz',margin+(3000/maxFreq)*plotW-4,topM+plotH+12);
+      fc.strokeStyle='#2a3a4a'; fc.lineWidth=1;
+      fc.beginPath(); fc.moveTo(margin,topM); fc.lineTo(margin,topM+plotH); fc.lineTo(margin+plotW,topM+plotH); fc.stroke();
+      fst++;
+      physicsAnimFrames.push(requestAnimationFrame(drawFormantSpec));
+    }
+    drawFormantSpec();
+  }
+
+  // ---- 8. Signal chain ----
+  const scc = document.getElementById('signalChainCanvas');
+  if (scc) {
+    scc.width = scc.offsetWidth * devicePixelRatio;
+    scc.height = scc.offsetHeight * devicePixelRatio;
+    const sc2 = scc.getContext('2d');
+    sc2.scale(devicePixelRatio, devicePixelRatio);
+    const SCW = scc.offsetWidth, SCH = scc.offsetHeight;
+    let sct = 0;
+    const nodes = [
+      { label:'LUNGS', sub:'air pressure', color:'#f0c040' },
+      { label:'FOLDS', sub:'pitch buzz', color:'#7090ff' },
+      { label:'TRACT', sub:'formants', color:'#4af0c4' },
+      { label:'LIPS', sub:'radiation', color:'#f06050' },
+      { label:'EAR', sub:'perception', color:'#e080ff' },
+    ];
+    function drawSignalChain() {
+      if (!physicsAnimating) return;
+      sc2.fillStyle='#0d1318'; sc2.fillRect(0,0,SCW,SCH);
+      const step=SCW/nodes.length;
+      nodes.forEach((n,i) => {
+        const cx=step*i+step*0.5, cy=SCH*0.5;
+        const pulse=0.8+0.2*Math.sin(sct*0.06-i*0.8);
+        // Arrow to next
+        if(i<nodes.length-1){
+          const flowPhase=(sct*0.04-i*0.5)%1;
+          sc2.strokeStyle=`rgba(${n.color.slice(1).match(/../g).map(h=>parseInt(h,16)).join(',')},0.3)`;
+          sc2.lineWidth=2;
+          sc2.beginPath(); sc2.moveTo(cx+22,cy); sc2.lineTo(cx+step-22,cy); sc2.stroke();
+          // flowing dot
+          const dotX=cx+22+(step-44)*((sct*0.03+i*0.33)%1);
+          sc2.beginPath(); sc2.arc(dotX,cy,3,0,Math.PI*2);
+          sc2.fillStyle=n.color; sc2.fill();
+        }
+        // Node circle
+        sc2.beginPath(); sc2.arc(cx,cy,18*pulse,0,Math.PI*2);
+        sc2.fillStyle=n.color+'22'; sc2.fill();
+        sc2.strokeStyle=n.color; sc2.lineWidth=1.5; sc2.stroke();
+        sc2.fillStyle=n.color; sc2.font='bold 7px Space Mono,monospace';
+        sc2.textAlign='center';
+        sc2.fillText(n.label,cx,cy-2);
+        sc2.fillStyle='#5a6a7a'; sc2.font='6px Space Mono,monospace';
+        sc2.fillText(n.sub,cx,cy+9);
+        sc2.textAlign='left';
+      });
+      sct++;
+      physicsAnimFrames.push(requestAnimationFrame(drawSignalChain));
+    }
+    drawSignalChain();
+  }
+}
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -655,7 +1189,9 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (currentTab === 'physics') {
       document.getElementById('canvasWrap').style.display = 'none';
       document.getElementById('physicsPanel').style.display = 'block';
+      setTimeout(startPhysicsAnims, 80);
     } else {
+      stopPhysicsAnims();
       document.getElementById('canvasWrap').style.display = 'block';
       document.getElementById('physicsPanel').style.display = 'none';
     }
