@@ -60,6 +60,17 @@
     grid-template-columns: 1fr 320px;
     gap: 0;
     flex: 1;
+    min-height: 0;
+  }
+  #physicsPage {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 40px 60px;
+    width: 100%;
   }
 
   .main-canvas-area {
@@ -68,9 +79,12 @@
     border-right: 1px solid var(--border);
   }
 
-  .tab-bar {
+  .tab-bar, .top-tab-bar {
     display: flex;
     border-bottom: 1px solid var(--border);
+  }
+  .top-tab-bar {
+    flex-shrink: 0;
   }
 
   .tab {
@@ -95,7 +109,7 @@
     min-height: 320px;
   }
 
-  canvas {
+  #mainCanvas {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
@@ -343,18 +357,25 @@
   <span>Interactive Physics Visualizer</span>
 </header>
 
-<div class="layout">
+<!-- Top-level tab bar shared across both pages -->
+<div class="top-tab-bar">
+  <button class="tab" data-tab="physics">Physics Primer</button>
+  <button class="tab active" data-tab="tract">Vocal Tract</button>
+  <button class="tab" data-tab="wave">Standing Wave</button>
+  <button class="tab" data-tab="body">Body Cross-Section</button>
+</div>
+
+<!-- Physics page (full width) -->
+<div id="physicsPage" style="display:none; flex:1; overflow-y:auto; padding:32px 40px 60px; font-family:'Space Mono',monospace; min-height:0;">
+  <div id="physicsPanel"></div>
+</div>
+
+<!-- Visualizer page (grid layout) -->
+<div id="vizPage" class="layout">
   <div class="main-canvas-area">
-    <div class="tab-bar">
-      <button class="tab" data-tab="physics">Physics Primer</button>
-      <button class="tab active" data-tab="tract">Vocal Tract</button>
-      <button class="tab" data-tab="wave">Standing Wave</button>
-      <button class="tab" data-tab="body">Body Cross-Section</button>
-    </div>
     <div class="canvas-wrap" id="canvasWrap">
       <canvas id="mainCanvas"></canvas>
     </div>
-    <div id="physicsPanel" style="display:none;overflow-y:auto;flex:1;min-height:0;padding:32px 36px 40px;font-family:'Space Mono',monospace;"></div>
   </div>
 
   <div class="sidebar">
@@ -1099,17 +1120,16 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active');
     currentTab = tab.dataset.tab;
     if (currentTab === 'physics') {
-      document.getElementById('canvasWrap').style.display = 'none';
-      document.getElementById('physicsPanel').style.display = 'block';
-      // Wait two frames so the panel is laid out before reading canvas dimensions
+      document.getElementById('physicsPage').style.display = 'block';
+      document.getElementById('vizPage').style.display = 'none';
       requestAnimationFrame(() => requestAnimationFrame(() => {
         stopPhysicsAnims();
         startPhysicsAnims();
       }));
     } else {
       stopPhysicsAnims();
-      document.getElementById('canvasWrap').style.display = 'block';
-      document.getElementById('physicsPanel').style.display = 'none';
+      document.getElementById('physicsPage').style.display = 'none';
+      document.getElementById('vizPage').style.display = 'grid';
       resize();
     }
   });
@@ -1249,8 +1269,9 @@ document.getElementById('playBtn').addEventListener('click', () => {
 
 // ===== DRAWING =====
 function resize() {
+  if (currentTab === 'physics') return;
   const wrap = document.getElementById('canvasWrap');
-  if (!wrap || wrap.style.display === 'none') return;
+  if (!wrap) return;
   const w = wrap.clientWidth, h = wrap.clientHeight;
   if (!w || !h) return;
   canvas.width = w * window.devicePixelRatio;
