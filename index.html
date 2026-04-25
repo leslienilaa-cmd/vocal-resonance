@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocal Resonance Visualizer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,200&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0c10;
+    --panel: #0f1318;
+    --border: #1e2530;
+    --accent1: #4af0c4;
+    --accent2: #f06050;
+    --accent3: #7090ff;
+    --accent4: #f0c040;
+    --text: #c8d8e8;
+    --muted: #5a6a7a;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  header {
+    padding: 24px 32px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 200;
+    font-size: 2rem;
+    color: var(--accent1);
+    letter-spacing: -0.02em;
+  }
+
+  header span {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    flex: 1;
+  }
+
+  .main-canvas-area {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+  }
+
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--muted);
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--accent1); border-bottom-color: var(--accent1); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .canvas-wrap {
+    flex: 1;
+    position: relative;
+    min-height: 320px;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .control-name {
+    font-size: 0.72rem;
+    color: var(--text);
+  }
+
+  .control-value {
+    font-size: 0.72rem;
+    color: var(--accent1);
+    min-width: 48px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    outline: none;
+    border-radius: 2px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent1);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent1);
+  }
+
+  .vowel-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .vowel-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    padding: 10px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .vowel-btn small { font-family: 'Space Mono', monospace; font-style: normal; font-size: 0.5rem; color: var(--muted); }
+  .vowel-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+  .vowel-btn.active { border-color: var(--accent1); background: #0f2820; color: var(--accent1); }
+
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .info-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent1);
+    padding: 12px;
+    font-size: 0.65rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .info-box strong { color: var(--text); }
+
+  hr { border: none; border-top: 1px solid var(--border); }
+
+  .play-btn {
+    background: none;
+    border: 1px solid var(--accent1);
+    color: var(--accent1);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .play-btn:hover { background: var(--accent1); color: var(--bg); }
+  .play-btn.active { background: var(--accent2); border-color: var(--accent2); color: white; }
+
+  #physicsPanel {
+    color: var(--text);
+    line-height: 1.8;
+  }
+  .phys-section {
+    margin-bottom: 40px;
+    border-left: 3px solid var(--border);
+    padding-left: 20px;
+  }
+  .phys-section:hover { border-left-color: var(--accent1); }
+  .phys-tag {
+    font-size: 0.55rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .phys-title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.45rem;
+    color: var(--accent1);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .phys-body {
+    font-size: 0.7rem;
+    color: #8a9aaa;
+    line-height: 1.9;
+    margin-bottom: 10px;
+  }
+  .phys-body strong { color: var(--text); font-weight: 700; }
+  .phys-analogy {
+    background: #0d1820;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 14px;
+    font-size: 0.65rem;
+    color: #6a8a7a;
+    font-style: italic;
+    margin-top: 8px;
+  }
+  .phys-analogy::before { content: "↳ Analogy: "; color: var(--accent1); font-style: normal; font-weight: 700; }
+  .phys-term {
+    display: inline-block;
+    background: #0f2820;
+    border: 1px solid #1e4030;
+    color: var(--accent1);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+  .phys-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+  .phys-chapter {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 20px;
+    margin-top: 8px;
+  }
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .concept-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+  }
+  .concept-card .card-term { font-size: 0.6rem; color: var(--accent1); letter-spacing: 0.08em; margin-bottom: 4px; }
+  .concept-card .card-body { font-size: 0.62rem; color: #7a8a9a; line-height: 1.7; }
+  .concept-card .card-body strong { color: var(--text); }
+  .wave-mini-canvas { width: 100%; height: 70px; display: block; margin: 10px 0; border-radius: 3px; background: #0d1318; }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .main-canvas-area { border-right: none; }
+    .sidebar { border-top: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Vocal Resonance</h1>
+  <span>Interactive Physics Visualizer</span>
+</header>
+
+<div class="layout">
+  <div class="main-canvas-area">
+    <div class="tab-bar">
+      <button class="tab" data-tab="physics">Physics Primer</button>
+      <button class="tab active" data-tab="tract">Vocal Tract</button>
+      <button class="tab" data-tab="wave">Standing Wave</button>
+      <button class="tab" data-tab="body">Body Cross-Section</button>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="mainCanvas"></canvas>
+    </div>
+    <div id="physicsPanel" style="display:none;overflow-y:auto;height:100%;padding:32px 36px 40px;font-family:'Space Mono',monospace;"></div>
+  </div>
+
+  <div class="sidebar">
+    <div>
+      <div class="section-label">Vowel Preset</div>
+      <div class="vowel-grid">
+        <button class="vowel-btn active" data-vowel="a">A<small>as in "far"</small></button>
+        <button class="vowel-btn" data-vowel="e">E<small>as in "hey"</small></button>
+        <button class="vowel-btn" data-vowel="i">I<small>as in "see"</small></button>
+        <button class="vowel-btn" data-vowel="o">O<small>as in "go"</small></button>
+        <button class="vowel-btn" data-vowel="u">U<small>as in "who"</small></button>
+        <button class="vowel-btn" data-vowel="hum">♩<small>humming</small></button>
+      </div>
+    </div>
+
+    <hr>
+
+    <div>
+      <div class="section-label">Controls</div>
+      <div class="control-group">
+        <div class="control-row">
+          <div class="control-header">
+            <span class="control-name">Pitch (Hz)</span>
+            <span class="control-value" id="pitchVal">120</span>
+          </div>
+          <input type="range" id="pitchSlider" min="80" max="400" value="120">
+        </div>
+        <div class="control-row">
+          <div class="control-header">
+            <span class="control-name">Volume</span>
+            <span class="control-value" id="volVal">70%</span>
+          </div>
+          <input type="range" id="volSlider" min="0" max="100" value="70">
+        </div>
+        <div class="control-row">
+          <div class="control-header">
+            <span class="control-name">Mouth Opening</span>
+            <span class="control-value" id="mouthVal">50%</span>
+          </div>
+          <input type="range" id="mouthSlider" min="5" max="100" value="50">
+        </div>
+        <div class="control-row">
+          <div class="control-header">
+            <span class="control-name">Tongue Position</span>
+            <span class="control-value" id="tongueVal">Mid</span>
+          </div>
+          <input type="range" id="tongueSlider" min="0" max="100" value="50">
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div>
+      <button class="play-btn" id="playBtn">▶ Play Tone (Web Audio)</button>
+    </div>
+
+    <hr>
+
+    <div>
+      <div class="section-label">Legend</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4af0c4"></div>Pressure antinode (max)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f06050"></div>Pressure node (zero)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7090ff"></div>Vocal fold vibration</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f0c040"></div>Formant resonance peak</div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="info-box" id="infoBox">
+      <strong>How it works:</strong> Your vocal folds buzz at your pitch frequency, creating harmonics. The shape of your vocal tract amplifies certain frequencies — these are <strong>formants</strong>. Different vowels = different tract shapes = different resonant peaks.
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+
+let currentTab = 'tract';
+let animFrame;
+let t = 0;
+
+// State
+let state = {
+  pitch: 120,
+  volume: 0.7,
+  mouth: 0.5,
+  tongue: 0.5,
+  vowel: 'a'
+};
+
+// Vowel presets: [F1, F2, tonguePos, mouthOpen, label]
+const vowels = {
+  a:   { f1: 800,  f2: 1200, tongue: 0.2, mouth: 0.75, info: '<strong>Vowel /a/</strong>: Low tongue, wide open mouth. Low F1 (~800Hz), low F2. Large open cavity with minimal constriction.' },
+  e:   { f1: 550,  f2: 1900, tongue: 0.65, mouth: 0.45, info: '<strong>Vowel /e/</strong>: Mid tongue raised front, moderate mouth. Higher F2 from front cavity resonance.' },
+  i:   { f1: 300,  f2: 2300, tongue: 0.85, mouth: 0.25, info: '<strong>Vowel /i/</strong>: High front tongue, small opening. Very high F2 (~2300Hz) — the front cavity is tiny, raising resonance dramatically.' },
+  o:   { f1: 500,  f2: 900,  tongue: 0.3, mouth: 0.55, info: '<strong>Vowel /o/</strong>: Back tongue, rounded lips. Low F2 — the back cavity and lip rounding lower resonant frequencies.' },
+  u:   { f1: 320,  f2: 700,  tongue: 0.75, mouth: 0.15, info: '<strong>Vowel /u/</strong>: High back tongue, very rounded small lips. Lowest F2 of all vowels. Lip rounding is a powerful resonance shaper.' },
+  hum: { f1: 250,  f2: 600,  tongue: 0.5,  mouth: 0.02, info: '<strong>Humming</strong>: Closed lips. Sound exits through nasal cavity only. Nasal resonators dominate — you feel the buzz in your face and skull.' },
+};
+
+function applyVowel(v) {
+  const d = vowels[v];
+  state.vowel = v;
+  state.tongue = d.tongue;
+  state.mouth = d.mouth;
+  document.getElementById('tongueSlider').value = d.tongue * 100;
+  document.getElementById('mouthSlider').value = d.mouth * 100;
+  updateLabels();
+  updateFormants();
+  document.getElementById('infoBox').innerHTML = d.info;
+}
+
+function updateLabels() {
+  document.getElementById('pitchVal').textContent = state.pitch + ' Hz';
+  document.getElementById('volVal').textContent = Math.round(state.volume * 100) + '%';
+  const m = Math.round(state.mouth * 100);
+  document.getElementById('mouthVal').textContent = m + '%';
+  const tv = state.tongue;
+  document.getElementById('tongueVal').textContent = tv < 0.33 ? 'Low' : tv < 0.66 ? 'Mid' : 'High';
+}
+
+// Controls
+document.getElementById('pitchSlider').addEventListener('input', e => {
+  state.pitch = +e.target.value;
+  updateLabels();
+  if (playing) updateFormants();
+});
+document.getElementById('volSlider').addEventListener('input', e => {
+  state.volume = e.target.value / 100;
+  updateLabels();
+  if (playing) updateFormants();
+});
+document.getElementById('mouthSlider').addEventListener('input', e => {
+  state.mouth = e.target.value / 100;
+  updateLabels();
+  clearVowelActive();
+  if (playing) updateFormants();
+});
+document.getElementById('tongueSlider').addEventListener('input', e => {
+  state.tongue = e.target.value / 100;
+  updateLabels();
+  clearVowelActive();
+  if (playing) updateFormants();
+});
+
+document.querySelectorAll('.vowel-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.vowel-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyVowel(btn.dataset.vowel);
+    if (playing) updateFormants();
+  });
+});
+
+function clearVowelActive() {
+  document.querySelectorAll('.vowel-btn').forEach(b => b.classList.remove('active'));
+}
+
+// Physics panel content
+const physicsHTML = `
+<div class="phys-chapter">Chapter 01 — The Physics of Sound</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 01</div>
+  <div class="phys-title">What is a Sound Wave?</div>
+  <div class="phys-body">
+    Sound is not a thing that travels — it is a <strong>disturbance that propagates</strong>. When something vibrates (a vocal fold, a guitar string, a speaker cone), it pushes the air molecules next to it. Those molecules bump into their neighbors, which bump into theirs, and so on. What travels through the air is not the molecules themselves, but a <strong>wave of pressure changes</strong> — regions of slightly higher pressure (<strong>compressions</strong>) alternating with regions of slightly lower pressure (<strong>rarefactions</strong>).
+    <br><br>
+    Air itself barely moves. A single air molecule just oscillates back and forth around its resting position by a fraction of a millimeter. The "wave" is just the pattern of that oscillation spreading outward at ~343 m/s (the speed of sound in air at room temperature).
+  </div>
+  <div class="phys-analogy">Think of a stadium "wave" — no person travels around the stadium, but the wave does. Sound works exactly like that, except the "people" are air molecules and the wave is invisible.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 02</div>
+  <div class="phys-title">Why Does Higher Frequency Sound Higher in Pitch?</div>
+  <div class="phys-body">
+    <strong>Frequency</strong> is how many times per second the pressure wave completes a full cycle — measured in <strong>Hertz (Hz)</strong>. 1 Hz = 1 cycle per second. 440 Hz = 440 cycles per second (concert A note).
+    <br><br>
+    Your ear contains thousands of tiny hair cells inside the <strong>cochlea</strong> — a fluid-filled spiral. Different hair cells are physically tuned to different frequencies: cells near the entrance respond to high frequencies, cells deep inside respond to low ones. When a sound wave reaches your ear, it makes the corresponding hair cells vibrate. Your brain reads <em>which</em> cells are firing and interprets that as pitch.
+    <br><br>
+    So "high pitch" = <strong>fast oscillation</strong> = more cycles per second = specific hair cells activated. It is entirely a physical + biological mapping. There is nothing inherently "high" about a high-pitched sound — it is just faster.
+  </div>
+  <div class="phys-analogy">A hummingbird flaps its wings ~80 times/second (you hear a buzz). A bee ~200 times/second (higher buzz). A mosquito ~600 times/second (even higher whine). Same physics — just faster oscillation = higher pitch perceived.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 03</div>
+  <div class="phys-title">Wavelength, Frequency & the Speed of Sound</div>
+  <div class="phys-body">
+    These three are locked together by one equation: <strong>speed = frequency × wavelength</strong>. Since the speed of sound is fixed (~343 m/s in air), a higher frequency wave must have a shorter wavelength, and vice versa.
+    <br><br>
+    At 100 Hz (deep voice): wavelength ≈ 3.4 meters<br>
+    At 1000 Hz (mid resonance): wavelength ≈ 34 cm — about the length of your vocal tract<br>
+    At 10,000 Hz (high overtone): wavelength ≈ 3.4 cm — about the width of your mouth
+    <br><br>
+    This matters enormously for vocal resonance: your vocal tract is roughly 17 cm long, which means it naturally resonates at frequencies whose wavelengths fit as <strong>standing waves</strong> inside it — typically in the range of 500–3000 Hz.
+  </div>
+  <div class="phys-analogy">A guitar string 65 cm long only resonates at notes whose wavelengths "fit" on it. Your vocal tract is the same — a tube that picks its own favorite frequencies.</div>
+</div>
+
+<hr class="phys-divider">
+<div class="phys-chapter">Chapter 02 — Resonance & Standing Waves</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 04</div>
+  <div class="phys-title">What is Resonance?</div>
+  <div class="phys-body">
+    Resonance is what happens when a wave is reflected back on itself and the reflections line up perfectly. When a sound wave hits the closed end of a tube (like the back of your throat at the vocal folds) it reflects. When it hits the open end (your lips) it also partially reflects. If the tube length is just right, the reflected wave arrives back in sync with the next outgoing wave — they add together instead of canceling. Energy builds up dramatically. The tube is said to be <strong>resonating at that frequency</strong>.
+    <br><br>
+    At other frequencies, the reflections arrive out of sync, cancel each other out, and the sound dies quickly. Resonance is therefore a <strong>natural filter</strong> — it dramatically amplifies certain frequencies and suppresses others.
+  </div>
+  <div class="phys-analogy">Pushing a child on a swing: if you push at exactly the right moment (the swing's natural frequency), energy builds up and the swing goes higher and higher. Push at the wrong moment and you fight against it. Resonance is that "exactly right moment" for sound waves.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 05</div>
+  <div class="phys-title">Standing Waves — Pressure Nodes & Antinodes</div>
+  <div class="phys-body">
+    When resonance occurs, the ongoing and reflected waves combine to create a <strong>standing wave</strong>: a pattern that appears frozen in space. It has two characteristic features:
+  </div>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="card-term" style="color:#4af0c4">● Pressure Antinode</div>
+      <div class="card-body">A point of <strong>maximum pressure variation</strong>. Air molecules here swing between very high and very low pressure. This is where the wave's energy is most concentrated. In a closed tube, antinodes form at the <strong>closed end</strong> — because the wall stops molecules from moving, so all the energy goes into pressure. Shown in <strong style="color:#4af0c4">green</strong> in the visualizer.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f06050">● Pressure Node</div>
+      <div class="card-body">A point of <strong>zero pressure variation</strong> — pressure here never changes, it stays at atmospheric. Molecules at a node actually move the most (they oscillate back and forth), but their pushing creates no net pressure. Nodes form at <strong>open ends</strong> of tubes — the opening lets air escape freely, so pressure equalizes. Shown in <strong style="color:#f06050">red</strong> in the visualizer.</div>
+    </div>
+  </div>
+  <div class="phys-body" style="margin-top:12px">
+    They always alternate: antinode → node → antinode → node... The distance between adjacent node and antinode is always exactly <strong>¼ of the wavelength</strong>. For your vocal tract (~17 cm), the first resonance has its antinode at your vocal folds and its node at your open lips — that's a quarter wavelength of ~68 cm, corresponding to ~500 Hz. That is your first formant!
+  </div>
+  <div class="phys-analogy">A guitar string: the fixed ends (nut and bridge) are displacement antinodes and pressure nodes. The middle of the string is the opposite. You can see and touch the standing wave on a guitar string — in air, it's the same pattern but invisible.</div>
+</div>
+
+<hr class="phys-divider">
+<div class="phys-chapter">Chapter 03 — Voice-Specific Resonance</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 06</div>
+  <div class="phys-title">What are Formants? What are F1 and F2?</div>
+  <div class="phys-body">
+    Your vocal folds don't produce a pure tone — they produce a <strong>complex buzz</strong> containing hundreds of frequencies simultaneously (called harmonics: your pitch, 2× your pitch, 3× your pitch, etc.). This raw buzz then travels through your vocal tract, which is a tube with a complex shape.
+    <br><br>
+    The vocal tract resonates at several specific frequencies — these resonant peaks are called <strong>formants</strong>. Each formant acts like a spotlight: it <strong>amplifies whichever harmonics happen to fall near it</strong> and lets the others fade. The result is your voice's characteristic sound.
+    <br><br>
+    <strong>F1 (First Formant)</strong> — The lowest resonance of the vocal tract. Primarily controlled by mouth opening and jaw height. Open mouth → F1 rises (≈ 250–900 Hz). F1 determines how "open" or "close" a vowel sounds. In phonetics: distinguishes "aa" (high F1) from "ee" (low F1).
+    <br><br>
+    <strong>F2 (Second Formant)</strong> — The second resonance. Primarily controlled by tongue position front-to-back. High front tongue → F2 rises (up to ~2300 Hz). Low back tongue → F2 drops (~700 Hz). F2 determines the vowel's "color" — bright/fronted vs. dark/backed. It's the single most important formant for vowel identity.
+    <br><br>
+    <strong>F3 and above</strong> — Shape voice timbre and speaker identity. F3 interacts with F2 in ways that give voices their characteristic "brightness" or "nasality."
+  </div>
+  <div class="phys-analogy">Think of formants as equalizer bands that are built into your anatomy. Every time you move your tongue or jaw, you're physically retuning those bands — live, in real time — changing which harmonics get amplified.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 07</div>
+  <div class="phys-title">What is a Formant Resonance Peak?</div>
+  <div class="phys-body">
+    In a frequency spectrum of your voice, formants appear as <strong>broad peaks of amplified energy</strong>. They exist because at the formant frequency, standing waves build up powerfully inside the vocal tract — the wave bounces back and forth and reinforces itself. Harmonics near that frequency get a boost; harmonics far from it don't.
+    <br><br>
+    The peak is <strong>broad</strong> (not a sharp spike) because the vocal tract is not a perfect rigid tube — it absorbs some energy at the walls, and the open mouth lets energy escape. This "leakiness" spreads the resonance across a bandwidth of roughly 50–200 Hz around the center frequency.
+    <br><br>
+    Shown in <strong style="color:#f0c040">gold</strong> in the spectrum view — the taller the peak, the stronger that resonance, the more that frequency range dominates your sound.
+  </div>
+  <div class="phys-analogy">A wine glass resonates at one precise frequency (its "ring"). If you fill it with water, the resonance shifts lower and broadens — less perfect, more lossy. Your vocal tract is like a wet, leaky wine glass that you reshape 10 times per second.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 08</div>
+  <div class="phys-title">Putting It All Together</div>
+  <div class="phys-body">
+    When you speak or sing, here is the complete chain of physics:
+    <br><br>
+    <strong>1. Lungs</strong> → build air pressure below the vocal folds<br>
+    <strong>2. Vocal folds</strong> → vibrate at your pitch frequency (80–400 Hz), producing a rich harmonic buzz<br>
+    <strong>3. Vocal tract</strong> → acts as a resonant cavity; its shape determines which harmonics are amplified (formants)<br>
+    <strong>4. Lips/nose</strong> → radiate the shaped sound outward into the air<br>
+    <strong>5. Your ear</strong> → decomposes the complex wave back into frequencies; your brain maps those to pitch, vowel, timbre, and identity
+    <br><br>
+    Every vowel you produce is a unique <strong>F1/F2 coordinate</strong> in acoustic space. Linguists literally plot vowels on an F1 vs. F2 graph — and the positions are remarkably consistent across all speakers of a language, because the physics of the vocal tract is universal.
+  </div>
+  <div class="phys-analogy">Your voice is a wind instrument you carry inside your body, tunable in real time by muscles you've been practicing since you were a baby learning to speak.</div>
+</div>
+`;
+
+document.getElementById('physicsPanel').innerHTML = physicsHTML;
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentTab = tab.dataset.tab;
+    if (currentTab === 'physics') {
+      document.getElementById('canvasWrap').style.display = 'none';
+      document.getElementById('physicsPanel').style.display = 'block';
+    } else {
+      document.getElementById('canvasWrap').style.display = 'block';
+      document.getElementById('physicsPanel').style.display = 'none';
+    }
+  });
+});
+
+// Web Audio — Formant vocal synthesizer
+// Architecture: sawtooth → tilt filter → 3 bandpass formant filters → gain → compressor → out
+let audioCtx = null, playing = false;
+let oscNode = null, tiltFilter = null, masterGain = null;
+let formantFilters = []; // [F1, F2, F3] BPF nodes
+let formantGains = [];   // individual gain per formant band
+let updateInterval = null;
+
+// Vowel formant data: [F1, F2, F3, F1bw, F2bw, F3bw]
+const formantData = {
+  a:   [800,  1200, 2500, 120, 150, 200],
+  e:   [480,  1800, 2600, 80,  150, 200],
+  i:   [280,  2300, 3000, 60,  120, 180],
+  o:   [500,  900,  2500, 90,  140, 200],
+  u:   [310,  700,  2200, 70,  110, 180],
+  hum: [280,  900,  2200, 60,  200, 300],
+};
+
+function buildVocalSynth() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Source: sawtooth (glottal buzz)
+  oscNode = audioCtx.createOscillator();
+  oscNode.type = 'sawtooth';
+  oscNode.frequency.value = state.pitch;
+
+  // Spectral tilt: high-shelf cut to soften the harsh overtones (-12dB/oct rolloff)
+  tiltFilter = audioCtx.createBiquadFilter();
+  tiltFilter.type = 'highshelf';
+  tiltFilter.frequency.value = 1000;
+  tiltFilter.gain.value = -18; // dB — makes it much less buzzy
+
+  // Low-cut to remove sub-rumble
+  const hiPass = audioCtx.createBiquadFilter();
+  hiPass.type = 'highpass';
+  hiPass.frequency.value = 60;
+
+  // Three formant bandpass filters
+  formantFilters = [];
+  formantGains = [];
+  const fd = computeLiveFormants();
+  const fgains = [1.0, 0.7, 0.35]; // F1 loudest, F3 quietest
+
+  for (let i = 0; i < 3; i++) {
+    const bpf = audioCtx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.value = fd[i];
+    // Q = center_freq / bandwidth
+    bpf.Q.value = fd[i] / fd[i + 3];
+
+    const fg = audioCtx.createGain();
+    fg.gain.value = fgains[i];
+
+    oscNode.connect(tiltFilter);
+    tiltFilter.connect(hiPass);
+    hiPass.connect(bpf);
+    bpf.connect(fg);
+
+    formantFilters.push(bpf);
+    formantGains.push(fg);
+  }
+
+  // Master gain + dynamics compressor to keep level safe
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = state.volume * 0.55;
+
+  const compressor = audioCtx.createDynamicsCompressor();
+  compressor.threshold.value = -18;
+  compressor.knee.value = 10;
+  compressor.ratio.value = 4;
+  compressor.attack.value = 0.003;
+  compressor.release.value = 0.1;
+
+  formantGains.forEach(fg => fg.connect(masterGain));
+  masterGain.connect(compressor);
+  compressor.connect(audioCtx.destination);
+
+  oscNode.start();
+}
+
+// Compute formant freqs live from tongue (0=low,1=high) and mouth (0=closed,1=open)
+function computeLiveFormants() {
+  const tongue = state.tongue;
+  const mouth  = state.mouth;
+  // F1: rises with mouth opening (jaw drop raises first resonance)
+  const F1 = 220 + mouth * 680;
+  // F2: tongue height & advancement — high-front tongue → high F2
+  const F2 = (650 + tongue * 1750) * (0.55 + mouth * 0.45);
+  // F3: less dramatic, tracks tongue
+  const F3 = 2100 + tongue * 900;
+  // Bandwidths widen with mouth open
+  const bw1 = 55  + mouth * 120;
+  const bw2 = 75  + mouth * 130;
+  const bw3 = 140 + mouth * 120;
+  return [F1, F2, F3, bw1, bw2, bw3];
+}
+
+function updateFormants() {
+  if (!audioCtx || !playing) return;
+  const now = audioCtx.currentTime;
+  const fd = computeLiveFormants();
+  formantFilters.forEach((bpf, i) => {
+    bpf.frequency.setTargetAtTime(Math.max(80, fd[i]), now, 0.03);
+    bpf.Q.setTargetAtTime(Math.max(1, fd[i] / fd[i + 3]), now, 0.03);
+  });
+  oscNode.frequency.setTargetAtTime(state.pitch, now, 0.03);
+  masterGain.gain.setTargetAtTime(state.volume * 0.55, now, 0.02);
+}
+
+function stopVocalSynth() {
+  if (oscNode) { try { oscNode.stop(); } catch(e){} oscNode = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  formantFilters = []; formantGains = [];
+  masterGain = null; tiltFilter = null;
+}
+
+document.getElementById('playBtn').addEventListener('click', () => {
+  if (!playing) {
+    buildVocalSynth();
+    playing = true;
+    document.getElementById('playBtn').textContent = '■ Stop';
+    document.getElementById('playBtn').classList.add('active');
+    updateInterval = setInterval(updateFormants, 60);
+  } else {
+    clearInterval(updateInterval);
+    stopVocalSynth();
+    playing = false;
+    document.getElementById('playBtn').textContent = '▶ Play Tone (Web Audio)';
+    document.getElementById('playBtn').classList.remove('active');
+  }
+});
+
+// ===== DRAWING =====
+function resize() {
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth * window.devicePixelRatio;
+  canvas.height = wrap.clientHeight * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+}
+window.addEventListener('resize', resize);
+resize();
+
+function W() { return canvas.width / window.devicePixelRatio; }
+function H() { return canvas.height / window.devicePixelRatio; }
+
+function drawTractTab() {
+  const w = W(), h = H();
+  ctx.clearRect(0, 0, w, h);
+
+  // Background grid
+  ctx.strokeStyle = '#1a2030';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < w; x += 30) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+  for (let y = 0; y < h; y += 30) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+
+  const margin = 60;
+  const tractY = h * 0.42;
+  const tractH = h * 0.22;
+  const tractW = w - margin * 2;
+
+  // Build tract shape: from glottis (left) to lips (right)
+  // tongue raises in middle, lips control opening at right
+  const segments = 80;
+  const topPoints = [], botPoints = [];
+
+  for (let i = 0; i <= segments; i++) {
+    const x = margin + (i / segments) * tractW;
+    const xn = i / segments;
+
+    // Base half-height of tract
+    let half = tractH * 0.45;
+
+    // Tongue constriction: bell curve centered around tongue position
+    const tongueCenter = 0.25 + state.tongue * 0.45;
+    const tongueWidth = 0.15;
+    const tongueMag = state.tongue * 0.55;
+    const tDist = (xn - tongueCenter) / tongueWidth;
+    const tongueEffect = tongueMag * Math.exp(-tDist * tDist) * tractH;
+
+    // Mouth opening at right
+    const mouthZone = Math.max(0, (xn - 0.85) / 0.15);
+    const mouthEffect = mouthZone * state.mouth * tractH * 0.7;
+
+    // Pharynx (back, left): slightly wider
+    const pharynxEffect = Math.max(0, (0.2 - xn) / 0.2) * tractH * 0.15;
+
+    half = half - tongueEffect * 0.6 + mouthEffect * 0.5 + pharynxEffect;
+    half = Math.max(half, 3);
+
+    // Vertical center drifts slightly with tongue
+    const centerShift = -tongueEffect * 0.3;
+
+    topPoints.push({ x, y: tractY - half + centerShift });
+    botPoints.push({ x, y: tractY + half * 0.9 + centerShift });
+  }
+
+  // Standing wave inside tract
+  const wavePoints = [];
+  const formantFreq = 3 + state.tongue * 4; // mock mode number
+  const mouthDamp = state.mouth;
+
+  for (let i = 0; i <= segments; i++) {
+    const xn = i / segments;
+    const top = topPoints[i], bot = botPoints[i];
+    const midY = (top.y + bot.y) / 2;
+    const halfH = (bot.y - top.y) / 2;
+
+    // Standing wave: sin(n*pi*x) with time oscillation
+    const waveAmp = halfH * 0.75 * state.volume;
+    const phase = xn * formantFreq * Math.PI;
+    const osc = Math.sin(phase) * Math.cos(t * 0.08 * (state.pitch / 120));
+    const pressure = waveAmp * osc;
+    wavePoints.push({ x: top.x, y: midY, pressure, halfH });
+  }
+
+  // Draw tract walls
+  ctx.beginPath();
+  topPoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = '#2a3a4a';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.beginPath();
+  botPoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+
+  // Fill tract interior
+  ctx.beginPath();
+  topPoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  for (let i = botPoints.length - 1; i >= 0; i--) ctx.lineTo(botPoints[i].x, botPoints[i].y);
+  ctx.closePath();
+  ctx.fillStyle = '#0d1820';
+  ctx.fill();
+
+  // Draw pressure wave as colored fill
+  for (let i = 0; i < wavePoints.length - 1; i++) {
+    const wp = wavePoints[i];
+    const pressure = wp.pressure / wp.halfH; // normalized -1..1
+    const pos = Math.max(0, pressure);
+    const neg = Math.max(0, -pressure);
+    const alpha = Math.abs(pressure) * 0.8;
+
+    ctx.beginPath();
+    const top = topPoints[i], bot = botPoints[i];
+    const top2 = topPoints[i+1], bot2 = botPoints[i+1];
+    ctx.moveTo(top.x, top.y);
+    ctx.lineTo(top2.x, top2.y);
+    ctx.lineTo(bot2.x, bot2.y);
+    ctx.lineTo(bot.x, bot.y);
+    ctx.closePath();
+    if (pressure > 0) {
+      ctx.fillStyle = `rgba(74,240,196,${alpha * 0.5})`;
+    } else {
+      ctx.fillStyle = `rgba(240,96,80,${alpha * 0.5})`;
+    }
+    ctx.fill();
+  }
+
+  // Draw wave line
+  ctx.beginPath();
+  wavePoints.forEach((wp, i) => {
+    const px = wp.x;
+    const py = wp.y + wp.pressure;
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.strokeStyle = '#4af0c4';
+  ctx.lineWidth = 2;
+  ctx.shadowBlur = 8;
+  ctx.shadowColor = '#4af0c4';
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Glottis (left end) — vocal folds
+  const glotX = margin;
+  const glotAmp = 6 * state.volume;
+  const foldOsc = Math.sin(t * 0.12 * (state.pitch / 120)) * glotAmp;
+  const glotTop = tractY - tractH * 0.45;
+  const glotBot = tractY + tractH * 0.4;
+  const glotMid = (glotTop + glotBot) / 2;
+
+  ctx.beginPath();
+  ctx.moveTo(glotX - 12, glotTop - 8);
+  ctx.bezierCurveTo(glotX + 4, glotTop - 4, glotX + 4, glotMid - foldOsc, glotX, glotMid);
+  ctx.strokeStyle = '#7090ff';
+  ctx.lineWidth = 3;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = '#7090ff';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(glotX - 12, glotBot + 8);
+  ctx.bezierCurveTo(glotX + 4, glotBot + 4, glotX + 4, glotMid + foldOsc, glotX, glotMid);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Labels
+  ctx.fillStyle = '#5a6a7a';
+  ctx.font = '10px Space Mono, monospace';
+  ctx.fillText('VOCAL FOLDS', margin - 8, tractY + tractH * 0.5 + 28);
+  ctx.fillText('PHARYNX', margin + tractW * 0.12, tractY - tractH * 0.5 - 10);
+  ctx.fillText('TONGUE', margin + (0.25 + state.tongue * 0.45) * tractW - 20, tractY + tractH * 0.5 + 28);
+  ctx.fillText('LIPS / MOUTH', margin + tractW * 0.87, tractY - tractH * 0.5 - 10);
+
+  // F1/F2 indicators
+  const f1 = vowels[state.vowel]?.f1 || 500;
+  const f2 = vowels[state.vowel]?.f2 || 1500;
+  ctx.fillStyle = '#f0c040';
+  ctx.font = 'bold 11px Space Mono, monospace';
+  ctx.fillText(`F1: ${f1} Hz`, margin, tractY + tractH * 0.5 + 56);
+  ctx.fillText(`F2: ${f2} Hz`, margin + 120, tractY + tractH * 0.5 + 56);
+
+  // Direction arrow
+  ctx.beginPath();
+  ctx.moveTo(margin + tractW + 12, tractY);
+  ctx.lineTo(margin + tractW + 24, tractY - 6);
+  ctx.lineTo(margin + tractW + 24, tractY + 6);
+  ctx.closePath();
+  ctx.fillStyle = '#4af0c4';
+  ctx.fill();
+  ctx.fillStyle = '#5a6a7a';
+  ctx.font = '9px Space Mono';
+  ctx.fillText('OUT', margin + tractW + 10, tractY + 16);
+}
+
+function drawWaveTab() {
+  const w = W(), h = H();
+  ctx.clearRect(0, 0, w, h);
+
+  const margin = 48;
+  const tubeY = h * 0.35;
+  const tubeH = h * 0.12;
+  const tubeW = w - margin * 2;
+
+  // Harmonics display
+  const harmonics = [1, 2, 3, 4];
+  const colors = ['#4af0c4', '#f0c040', '#7090ff', '#f06050'];
+
+  // Draw spectrum
+  ctx.fillStyle = '#0f1318';
+  ctx.strokeStyle = '#1e2530';
+  ctx.lineWidth = 1;
+  const specY = h * 0.72;
+  const specH = h * 0.2;
+  ctx.fillRect(margin, specY - specH, tubeW, specH);
+  ctx.strokeRect(margin, specY - specH, tubeW, specH);
+
+  ctx.fillStyle = '#3a4a5a';
+  ctx.font = '9px Space Mono, monospace';
+  ctx.fillText('FREQUENCY SPECTRUM', margin, specY - specH - 6);
+
+  const f1 = vowels[state.vowel]?.f1 || 500;
+  const f2 = vowels[state.vowel]?.f2 || 1500;
+  const maxFreq = 3000;
+
+  // Draw harmonics in spectrum
+  for (let n = 1; n <= 16; n++) {
+    const freq = state.pitch * n;
+    if (freq > maxFreq) break;
+    const sx = margin + (freq / maxFreq) * tubeW;
+    // Formant envelope
+    const d1 = Math.abs(freq - f1);
+    const d2 = Math.abs(freq - f2);
+    const env1 = Math.exp(-d1 * d1 / (80000));
+    const env2 = Math.exp(-d2 * d2 / (120000));
+    const amp = (env1 * 0.9 + env2 * 0.7) * state.volume;
+    const barH = amp * specH * 0.9;
+
+    const isFormant1 = d1 < 150;
+    const isFormant2 = d2 < 200;
+    ctx.fillStyle = isFormant1 ? '#4af0c4' : isFormant2 ? '#f0c040' : '#3a5a6a';
+    ctx.fillRect(sx - 2, specY - barH, 4, barH);
+  }
+
+  // F1/F2 markers
+  const f1x = margin + (f1 / maxFreq) * tubeW;
+  const f2x = margin + (f2 / maxFreq) * tubeW;
+  ctx.strokeStyle = '#4af0c4';
+  ctx.setLineDash([3, 3]);
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(f1x, specY - specH); ctx.lineTo(f1x, specY); ctx.stroke();
+  ctx.fillStyle = '#4af0c4';
+  ctx.font = '9px Space Mono'; ctx.fillText('F1', f1x + 3, specY - specH + 10);
+
+  ctx.strokeStyle = '#f0c040';
+  ctx.beginPath(); ctx.moveTo(f2x, specY - specH); ctx.lineTo(f2x, specY); ctx.stroke();
+  ctx.fillStyle = '#f0c040';
+  ctx.fillText('F2', f2x + 3, specY - specH + 10);
+  ctx.setLineDash([]);
+
+  // Axis labels
+  ctx.fillStyle = '#3a4a5a';
+  ctx.font = '9px Space Mono';
+  for (let f = 0; f <= maxFreq; f += 500) {
+    const sx = margin + (f / maxFreq) * tubeW;
+    ctx.fillText(f === 0 ? '0' : f / 1000 + 'k', sx - 6, specY + 12);
+  }
+  ctx.fillStyle = '#5a6a7a';
+  ctx.fillText('Hz', margin + tubeW + 4, specY + 4);
+
+  // Standing waves in tube
+  harmonics.forEach((n, idx) => {
+    const yOff = tubeY - idx * (tubeH * 1.8 + 16);
+
+    ctx.fillStyle = '#0d1318';
+    ctx.fillRect(margin, yOff - tubeH / 2, tubeW, tubeH);
+    ctx.strokeStyle = '#2a3a4a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(margin, yOff - tubeH / 2, tubeW, tubeH);
+
+    ctx.fillStyle = '#2a3a4a';
+    ctx.font = '9px Space Mono';
+    ctx.fillText(`n=${n}  ${Math.round(state.pitch * n)} Hz`, margin + 4, yOff - tubeH / 2 - 4);
+
+    ctx.beginPath();
+    for (let i = 0; i <= 200; i++) {
+      const xn = i / 200;
+      const x = margin + xn * tubeW;
+      const wave = Math.sin(n * Math.PI * xn) * Math.cos(t * 0.08 * n * (state.pitch / 120));
+      const y = yOff - wave * (tubeH / 2 - 4);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = colors[idx];
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 6; ctx.shadowColor = colors[idx];
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  });
+
+  ctx.fillStyle = '#3a4a5a';
+  ctx.font = '10px Space Mono';
+  ctx.fillText('STANDING WAVES — HARMONICS', margin, tubeY - 3.5 * (tubeH * 1.8 + 16) - 10);
+}
+
+function drawBodyTab() {
+  const w = W(), h = H();
+  ctx.clearRect(0, 0, w, h);
+
+  const cx = w * 0.38;
+  const cy = h * 0.5;
+  const scale = Math.min(w, h) * 0.0028;
+
+  function drawOval(x, y, rx, ry, color, alpha, glow) {
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    if (glow) { ctx.shadowBlur = 18; ctx.shadowColor = color; }
+    ctx.fillStyle = color.replace(')', `,${alpha})`).replace('rgb', 'rgba');
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Head
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - 115 * scale, 38 * scale, 46 * scale, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = '#2a3a4a';
+  ctx.lineWidth = 1.5;
+  ctx.fillStyle = '#0d1520';
+  ctx.fill(); ctx.stroke();
+
+  // Nasal cavity
+  const nasalOsc = Math.sin(t * 0.09 * (state.pitch / 120)) * state.volume;
+  const nasalAlpha = 0.15 + Math.abs(nasalOsc) * (state.vowel === 'hum' ? 0.55 : 0.2);
+  drawOval(cx, cy - 132 * scale, 20 * scale, 12 * scale, 'rgb(112,144,255)', nasalAlpha, state.vowel === 'hum');
+  ctx.fillStyle = '#4a5a7a';
+  ctx.font = `${8 * scale}px Space Mono`;
+  ctx.fillText('NASAL', cx - 16 * scale, cy - 144 * scale);
+
+  // Oral cavity
+  const oralOsc = Math.sin(t * 0.09 * (state.pitch / 120) + 0.5) * state.volume;
+  const oralAlpha = 0.15 + Math.abs(oralOsc) * 0.4;
+  drawOval(cx + 6 * scale, cy - 112 * scale, 22 * scale, 9 * scale, 'rgb(74,240,196)', oralAlpha, true);
+  ctx.fillStyle = '#4af0c4'; ctx.font = `${8 * scale}px Space Mono`;
+  ctx.fillText('ORAL', cx - 8 * scale, cy - 120 * scale);
+
+  // Neck / pharynx
+  ctx.beginPath();
+  ctx.rect(cx - 14 * scale, cy - 80 * scale, 28 * scale, 55 * scale);
+  ctx.fillStyle = '#0d1520'; ctx.fill();
+  ctx.strokeStyle = '#2a3a4a'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Larynx / vocal fold marker
+  const foldY = cy - 38 * scale;
+  const foldOsc = Math.sin(t * 0.12 * (state.pitch / 120)) * 3 * scale * state.volume;
+  ctx.beginPath();
+  ctx.moveTo(cx - 14 * scale, foldY);
+  ctx.lineTo(cx - foldOsc, foldY);
+  ctx.strokeStyle = '#7090ff'; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 10; ctx.shadowColor = '#7090ff'; ctx.stroke(); ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.moveTo(cx + 14 * scale, foldY);
+  ctx.lineTo(cx + foldOsc, foldY);
+  ctx.strokeStyle = '#7090ff'; ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 10; ctx.shadowColor = '#7090ff'; ctx.stroke(); ctx.shadowBlur = 0;
+
+  ctx.fillStyle = '#7090ff';
+  ctx.font = `${8 * scale}px Space Mono`;
+  ctx.fillText('VOCAL FOLDS', cx + 18 * scale, foldY + 3 * scale);
+
+  // Trachea
+  ctx.beginPath();
+  ctx.rect(cx - 10 * scale, cy - 20 * scale, 20 * scale, 40 * scale);
+  ctx.fillStyle = '#0a1018'; ctx.fill();
+  ctx.strokeStyle = '#1e2530'; ctx.lineWidth = 1; ctx.stroke();
+
+  // Lungs
+  const lungOsc = Math.sin(t * 0.03) * 5 * scale;
+  const lungAlpha = 0.12 + Math.abs(Math.sin(t * 0.08 * (state.pitch / 120))) * state.volume * 0.3;
+
+  drawOval(cx - 40 * scale, cy + 40 * scale, 28 * scale + lungOsc, 50 * scale + lungOsc, 'rgb(240,192,64)', lungAlpha, false);
+  drawOval(cx + 40 * scale, cy + 40 * scale, 28 * scale + lungOsc, 50 * scale + lungOsc, 'rgb(240,192,64)', lungAlpha, false);
+  ctx.fillStyle = '#8a7a30'; ctx.font = `${8 * scale}px Space Mono`;
+  ctx.fillText('LUNGS', cx - 14 * scale, cy + 90 * scale);
+
+  // Chest resonance waves
+  const chestAmp = state.volume * 12 * scale;
+  const chestOsc = Math.sin(t * 0.09 * (state.pitch / 120));
+  if (Math.abs(chestOsc) > 0.1) {
+    for (let ring = 1; ring <= 3; ring++) {
+      const rAlpha = (0.3 - ring * 0.08) * Math.abs(chestOsc) * state.volume;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 40 * scale, (30 + ring * 18) * scale, (60 + ring * 14) * scale, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(240,192,64,${rAlpha})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  // Sinus / skull resonance
+  const sinusOsc = Math.sin(t * 0.11 * (state.pitch / 120) + 1) * state.volume;
+  if (Math.abs(sinusOsc) > 0.05) {
+    for (let ring = 1; ring <= 2; ring++) {
+      const rAlpha = (0.25 - ring * 0.1) * Math.abs(sinusOsc);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - 115 * scale, (40 + ring * 14) * scale, (48 + ring * 12) * scale, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(112,144,255,${rAlpha})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  // Air flow arrow from lungs up
+  const arrowOsc = 0.5 + 0.5 * Math.abs(Math.sin(t * 0.1 * (state.pitch / 120)));
+  ctx.strokeStyle = `rgba(240,192,64,${arrowOsc * 0.6})`;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + 20 * scale);
+  ctx.lineTo(cx, cy - 30 * scale);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(cx - 5 * scale, cy - 26 * scale);
+  ctx.lineTo(cx, cy - 35 * scale);
+  ctx.lineTo(cx + 5 * scale, cy - 26 * scale);
+  ctx.fillStyle = `rgba(240,192,64,${arrowOsc * 0.6})`;
+  ctx.fill();
+
+  // Labels panel (right)
+  const lx = w * 0.68;
+  const items = [
+    { color: '#7090ff', label: 'Vocal folds', desc: `${state.pitch}Hz buzz` },
+    { color: '#4af0c4', label: 'Oral cavity', desc: 'F1/F2 shaped' },
+    { color: '#7090ff', label: 'Nasal cavity', desc: state.vowel === 'hum' ? 'Active (humming)' : 'Minor role' },
+    { color: '#f0c040', label: 'Chest / lungs', desc: 'Air pressure source' },
+  ];
+  items.forEach((item, i) => {
+    const iy = cy - 80 * scale + i * 36;
+    ctx.beginPath();
+    ctx.arc(lx, iy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = item.color; ctx.fill();
+    ctx.fillStyle = '#c8d8e8'; ctx.font = `bold ${9 * scale}px Space Mono`;
+    ctx.fillText(item.label, lx + 12, iy - 2);
+    ctx.fillStyle = '#5a6a7a'; ctx.font = `${8 * scale}px Space Mono`;
+    ctx.fillText(item.desc, lx + 12, iy + 12);
+  });
+}
+
+function draw() {
+  t++;
+  if (currentTab === 'tract') drawTractTab();
+  else if (currentTab === 'wave') drawWaveTab();
+  else drawBodyTab();
+  animFrame = requestAnimationFrame(draw);
+}
+
+applyVowel('a');
+updateLabels();
+draw();
+</script>
+</body>
+</html>
