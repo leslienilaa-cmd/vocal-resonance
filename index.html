@@ -714,11 +714,12 @@ function startPhysicsAnims() {
   // ---- 1. Particle wave diagram ----
   const pwc = document.getElementById('waveParticleCanvas');
   if (pwc) {
-    pwc.width = pwc.offsetWidth * devicePixelRatio;
-    pwc.height = pwc.offsetHeight * devicePixelRatio;
+    const PW = pwc.offsetWidth || pwc.parentElement.offsetWidth || 600;
+    const PH = pwc.offsetHeight || 110;
+    pwc.width = PW * devicePixelRatio;
+    pwc.height = PH * devicePixelRatio;
     const pc = pwc.getContext('2d');
     pc.scale(devicePixelRatio, devicePixelRatio);
-    const PW = pwc.offsetWidth, PH = pwc.offsetHeight;
     const ROWS = 4, COLS = 28;
     const dots = [];
     for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
@@ -761,11 +762,12 @@ function startPhysicsAnims() {
   // ---- 2. Frequency compare ----
   const fcc = document.getElementById('freqCompareCanvas');
   if (fcc) {
-    fcc.width = fcc.offsetWidth * devicePixelRatio;
-    fcc.height = fcc.offsetHeight * devicePixelRatio;
+    const FW = fcc.offsetWidth || 600;
+    const FH = fcc.offsetHeight || 130;
+    fcc.width = FW * devicePixelRatio;
+    fcc.height = FH * devicePixelRatio;
     const fc = fcc.getContext('2d');
     fc.scale(devicePixelRatio, devicePixelRatio);
-    const FW = fcc.offsetWidth, FH = fcc.offsetHeight;
     let ft = 0;
     function drawFreqCompare() {
       if (!physicsAnimating) return;
@@ -806,11 +808,12 @@ function startPhysicsAnims() {
   // ---- 3. Wavelength ruler ----
   const wlc = document.getElementById('wavelengthCanvas');
   if (wlc) {
-    wlc.width = wlc.offsetWidth * devicePixelRatio;
-    wlc.height = wlc.offsetHeight * devicePixelRatio;
+    const WW = wlc.offsetWidth || 600;
+    const WH = wlc.offsetHeight || 140;
+    wlc.width = WW * devicePixelRatio;
+    wlc.height = WH * devicePixelRatio;
     const wc = wlc.getContext('2d');
     wc.scale(devicePixelRatio, devicePixelRatio);
-    const WW = wlc.offsetWidth, WH = wlc.offsetHeight;
     // Static diagram — wavelength bars
     wc.fillStyle = '#0d1318'; wc.fillRect(0,0,WW,WH);
     const waves = [
@@ -851,11 +854,12 @@ function startPhysicsAnims() {
   // ---- 4. Resonance: in-sync vs out-of-sync ----
   const resc = document.getElementById('resonanceCanvas');
   if (resc) {
-    resc.width = resc.offsetWidth * devicePixelRatio;
-    resc.height = resc.offsetHeight * devicePixelRatio;
+    const RW = resc.offsetWidth || 600;
+    const RH = resc.offsetHeight || 150;
+    resc.width = RW * devicePixelRatio;
+    resc.height = RH * devicePixelRatio;
     const rc = resc.getContext('2d');
     rc.scale(devicePixelRatio, devicePixelRatio);
-    const RW = resc.offsetWidth, RH = resc.offsetHeight;
     let rt = 0;
     function drawResonance() {
       if (!physicsAnimating) return;
@@ -925,11 +929,12 @@ function startPhysicsAnims() {
   // ---- 5. Standing wave with labeled nodes/antinodes ----
   const swc = document.getElementById('standingWaveCanvas');
   if (swc) {
-    swc.width = swc.offsetWidth * devicePixelRatio;
-    swc.height = swc.offsetHeight * devicePixelRatio;
+    const SW = swc.offsetWidth || 600;
+    const SH = swc.offsetHeight || 160;
+    swc.width = SW * devicePixelRatio;
+    swc.height = SH * devicePixelRatio;
     const sc = swc.getContext('2d');
     sc.scale(devicePixelRatio, devicePixelRatio);
-    const SW = swc.offsetWidth, SH = swc.offsetHeight;
     let st = 0;
     function drawStandingWave() {
       if (!physicsAnimating) return;
@@ -992,11 +997,12 @@ function startPhysicsAnims() {
   // ---- 6. Vowel space F1 vs F2 chart ----
   const vsc = document.getElementById('vowelSpaceCanvas');
   if (vsc) {
-    vsc.width = vsc.offsetWidth * devicePixelRatio;
-    vsc.height = vsc.offsetHeight * devicePixelRatio;
+    const VW = vsc.offsetWidth || 600;
+    const VH = vsc.offsetHeight || 220;
+    vsc.width = VW * devicePixelRatio;
+    vsc.height = VH * devicePixelRatio;
     const vc = vsc.getContext('2d');
     vc.scale(devicePixelRatio, devicePixelRatio);
-    const VW = vsc.offsetWidth, VH = vsc.offsetHeight;
     vc.fillStyle='#0d1318'; vc.fillRect(0,0,VW,VH);
     const margin = 36;
     // Axes
@@ -1059,11 +1065,12 @@ function startPhysicsAnims() {
   // ---- 7. Formant spectrum diagram ----
   const fsc = document.getElementById('formantSpecCanvas');
   if (fsc) {
-    fsc.width = fsc.offsetWidth * devicePixelRatio;
-    fsc.height = fsc.offsetHeight * devicePixelRatio;
+    const FSW = fsc.offsetWidth || 600;
+    const FSH = fsc.offsetHeight || 160;
+    fsc.width = FSW * devicePixelRatio;
+    fsc.height = FSH * devicePixelRatio;
     const fc = fsc.getContext('2d');
     fc.scale(devicePixelRatio, devicePixelRatio);
-    const FSW = fsc.offsetWidth, FSH = fsc.offsetHeight;
     let fst = 0;
     function drawFormantSpec() {
       if (!physicsAnimating) return;
@@ -1132,11 +1139,12 @@ function startPhysicsAnims() {
   // ---- 8. Signal chain ----
   const scc = document.getElementById('signalChainCanvas');
   if (scc) {
-    scc.width = scc.offsetWidth * devicePixelRatio;
-    scc.height = scc.offsetHeight * devicePixelRatio;
+    const SCW = scc.offsetWidth || 600;
+    const SCH = scc.offsetHeight || 90;
+    scc.width = SCW * devicePixelRatio;
+    scc.height = SCH * devicePixelRatio;
     const sc2 = scc.getContext('2d');
     sc2.scale(devicePixelRatio, devicePixelRatio);
-    const SCW = scc.offsetWidth, SCH = scc.offsetHeight;
     let sct = 0;
     const nodes = [
       { label:'LUNGS', sub:'air pressure', color:'#f0c040' },
@@ -1189,11 +1197,16 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (currentTab === 'physics') {
       document.getElementById('canvasWrap').style.display = 'none';
       document.getElementById('physicsPanel').style.display = 'block';
-      setTimeout(startPhysicsAnims, 80);
+      // Wait two frames so the panel is laid out before reading canvas dimensions
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        stopPhysicsAnims();
+        startPhysicsAnims();
+      }));
     } else {
       stopPhysicsAnims();
       document.getElementById('canvasWrap').style.display = 'block';
       document.getElementById('physicsPanel').style.display = 'none';
+      resize();
     }
   });
 });
@@ -1332,9 +1345,13 @@ document.getElementById('playBtn').addEventListener('click', () => {
 
 // ===== DRAWING =====
 function resize() {
-  const wrap = canvas.parentElement;
-  canvas.width = wrap.clientWidth * window.devicePixelRatio;
-  canvas.height = wrap.clientHeight * window.devicePixelRatio;
+  const wrap = document.getElementById('canvasWrap');
+  if (!wrap || wrap.style.display === 'none') return;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if (!w || !h) return;
+  canvas.width = w * window.devicePixelRatio;
+  canvas.height = h * window.devicePixelRatio;
+  ctx.setTransform(1,0,0,1,0,0);
   ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 }
 window.addEventListener('resize', resize);
@@ -1779,9 +1796,11 @@ function drawBodyTab() {
 
 function draw() {
   t++;
-  if (currentTab === 'tract') drawTractTab();
-  else if (currentTab === 'wave') drawWaveTab();
-  else drawBodyTab();
+  if (currentTab !== 'physics') {
+    if (currentTab === 'tract') drawTractTab();
+    else if (currentTab === 'wave') drawWaveTab();
+    else if (currentTab === 'body') drawBodyTab();
+  }
   animFrame = requestAnimationFrame(draw);
 }
 
