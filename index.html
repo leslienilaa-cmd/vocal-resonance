@@ -66,11 +66,13 @@
     display: none;
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
-    max-width: 860px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 32px 40px 60px;
+    padding: 28px 32px 60px;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .main-canvas-area {
@@ -266,6 +268,8 @@
     margin-bottom: 40px;
     border-left: 3px solid var(--border);
     padding-left: 20px;
+    overflow-x: hidden;
+    word-break: break-word;
   }
   .phys-section:hover { border-left-color: var(--accent1); }
   .phys-tag {
@@ -328,7 +332,7 @@
   }
   .concept-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 12px;
     margin-top: 10px;
   }
@@ -366,7 +370,7 @@
 </div>
 
 <!-- Physics page (full width) -->
-<div id="physicsPage" style="display:none; flex:1; overflow-y:auto; padding:32px 40px 60px; font-family:'Space Mono',monospace; min-height:0;">
+<div id="physicsPage" style="display:none; flex:1; overflow-y:auto; overflow-x:hidden; padding:28px 32px 60px; font-family:'Space Mono',monospace; min-height:0; box-sizing:border-box;">
   <div id="physicsPanel"></div>
 </div>
 
@@ -542,7 +546,7 @@ function clearVowelActive() {
 const physicsHTML = `
 <style>
 .pdiag { background:#0d1318; border-radius:4px; margin:14px 0 6px; display:block; width:100%; }
-.pleg  { display:flex; flex-wrap:wrap; gap:16px; font-size:0.58rem; color:#5a6a7a; margin-bottom:12px; }
+.pleg  { display:flex; flex-wrap:wrap; gap:10px 16px; font-size:0.58rem; color:#5a6a7a; margin-bottom:12px; overflow-x:hidden; }
 .pleg span b { font-weight:700; }
 </style>
 
@@ -571,7 +575,7 @@ const physicsHTML = `
     <strong>Frequency</strong> (symbol <em>f</em>) measures how many complete cycles of a repeating event occur per second. Its SI unit is the <strong>Hertz (Hz)</strong>, named after physicist Heinrich Hertz (1857–1894).
     <br><br>
     <strong>The formula:</strong><br>
-    <code style="color:#4af0c4;font-size:1.05em">f = 1 / T</code>
+    <code style="color:#4af0c4;font-size:1.05em">f = 1 / T</code><br><span style="color:#5a7a6a;font-size:0.85em">units: [Hz] = [s⁻¹] &nbsp;|&nbsp; [T] = seconds (s) &nbsp;|&nbsp; Hz = s⁻¹ in SI base units</span>
     <br><br>
     where <strong>T</strong> is the <strong>period</strong> — the time (in seconds) for one complete cycle to occur. They are exact inverses of each other.
     <br><br>
@@ -585,8 +589,8 @@ const physicsHTML = `
     • Your vocal folds at <strong>120 Hz</strong>: they open and close <strong>120 times every second</strong>
     <br><br>
     <strong>Related quantities:</strong><br>
-    <strong>Angular frequency</strong> ω = 2πf (radians per second) — used in wave equations because rotation and oscillation share the same mathematics. One complete cycle = 2π radians.<br>
-    <strong>Wavelength</strong> λ = v/f — how far the wave travels in one period at speed v.
+    <strong>Angular frequency</strong> ω = 2πf &nbsp;<span style="color:#5a7a6a;font-size:0.85em">[ω] = rad·s⁻¹, [f] = s⁻¹, 2π is dimensionless (radians per cycle)</span><br>Used in wave equations because oscillation and circular motion share the same mathematics. One complete cycle sweeps 2π radians.<br>
+    <strong>Wavelength</strong> λ = v/f &nbsp;<span style="color:#5a7a6a;font-size:0.85em">[λ] = m, [v] = m·s⁻¹, [f] = s⁻¹ → [v/f] = m·s⁻¹/s⁻¹ = m ✓</span><br>How far the wave travels during one complete cycle.
     <br><br>
     <strong>Why "cycles per second" and not just "per second"?</strong><br>
     Strictly speaking, Hz = s⁻¹. But saying "120 per second" is ambiguous — per second of what? Adding "cycles" (even though it's dimensionless) makes the physical meaning clear: 120 complete oscillations happening every second.
@@ -602,7 +606,7 @@ const physicsHTML = `
 
 <div class="phys-section">
   <div class="phys-tag">Concept 01c</div>
-  <div class="phys-title">What is Missing to Understand Sound from First Principles?</div>
+  <div class="phys-title">First Principles of Sound</div>
   <div class="phys-body">
     This visualizer explains <em>what</em> sound does. To understand <em>why</em> — to derive it from scratch — you need a small set of foundational ideas. Each one unlocks a deeper layer:
   </div>
@@ -633,17 +637,119 @@ const physicsHTML = `
     </div>
     <div class="concept-card">
       <div class="card-term" style="color:#f0c040">Ideal Gas Law — PV = nRT</div>
-      <div class="card-body">Pressure in air is molecular collisions. Temperature is average molecular kinetic energy. The ideal gas law (PV = nRT) connects them. Combined with the wave equation, it gives v = √(γRT/M) — explaining why speed depends on temperature and gas composition, not pressure alone.</div>
+      <div class="card-body"><code style="color:#f0c040">PV = nRT</code><br>[P] = Pa = kg·m⁻¹·s⁻² | [V] = m³ | [PV] = J (energy)<br>[n] = mol | [R] = 8.314 J·mol⁻¹·K⁻¹ | [T] = K<br><br>Pressure IS molecular collisions — momentum (kg·m·s⁻¹) transferred per unit area per unit time → [kg·m·s⁻²·m⁻²] = Pa. Temperature is proportional to average molecular kinetic energy: E = (3/2)k_B·T where k_B = 1.38×10⁻²³ J·K⁻¹.<br><br>Combined with v = √(B/ρ), the ideal gas law gives v = √(γRT/M) — speed depends only on temperature and gas composition.</div>
     </div>
     <div class="concept-card">
       <div class="card-term" style="color:#f06050">Energy & Inverse Square Law</div>
-      <div class="card-body">Sound intensity (power per unit area) drops as 1/r² in open space because energy spreads over an ever-growing spherical surface. This explains why sound fades with distance, and why decibels use a logarithmic scale — human hearing spans a 10-trillion-fold range of intensity.</div>
+      <div class="card-body">Sound <strong>intensity</strong> I = P/(4πr²) &nbsp;<span style="color:#4a7060">[I] = W·m⁻² = kg·s⁻³ | [P] = W (watts) | [r] = m</span><br>Intensity falls as 1/r² because the same power P spreads over a sphere of area 4πr². Double the distance → quarter the intensity.<br><br><strong>Decibels:</strong> L = 10·log₁₀(I/I₀) &nbsp;[dB]<br>where I₀ = 10⁻¹² W·m⁻² (threshold of hearing). Each 10 dB = ×10 intensity. Human hearing spans ~120 dB = 10¹² times intensity range. The log scale compresses this to manageable numbers.</div>
     </div>
   </div>
   <div class="phys-body" style="margin-top:14px">
-    <strong>The dependency chain:</strong> Newton + Hooke → Wave Equation → Superposition + Boundary Conditions → Standing Waves + Resonance → Formants → Your Voice. Every concept on this page is downstream of that chain. Fourier Analysis is the mathematical language that makes it all computable. The Ideal Gas Law grounds the speed of sound in molecular reality.
+    <strong>The dependency chain:</strong> Newton + Hooke → Wave Equation → Superposition + Boundary Conditions → Standing Waves + Resonance → Formants → Your Voice. Every concept on this page is downstream of that chain. Fourier Analysis is the mathematical language that makes it all computable.
   </div>
   <div class="phys-analogy">You don't need all of this to use or appreciate acoustics — just as you don't need fluid dynamics to swim. But knowing the chain reveals that vocal resonance is not magic or biology-specific: it is Newton's laws, applied to air, shaped by geometry.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 01c — Math</div>
+  <div class="phys-title">The Mathematics Behind the Physics</div>
+  <div class="phys-body">
+    The first principles above are expressed in calculus. Here is the mathematical toolkit needed to read them — explained from first concepts, with units throughout.
+  </div>
+
+  <div class="concept-grid" style="margin-top:12px">
+    <div class="concept-card">
+      <div class="card-term" style="color:#4af0c4">Derivatives — Instantaneous Rate of Change</div>
+      <div class="card-body">
+        A derivative dy/dt measures how fast y changes at this exact instant.<br><br>
+        <code style="color:#4af0c4;font-size:0.9em">dy/dt = lim[Δt→0] (y(t+Δt) − y(t)) / Δt</code><br><br>
+        You shrink the time interval Δt toward zero and ask what the ratio approaches. This gives the instantaneous slope of the curve y(t).<br><br>
+        <strong>Units:</strong> [dy/dt] = [y]/[t]. If y is position [m] and t is time [s], then dy/dt is velocity [m·s⁻¹]. The second derivative d²y/dt² = acceleration [m·s⁻²].<br><br>
+        <strong>Partial derivatives</strong> (∂y/∂x): same idea, but y depends on multiple variables. ∂y/∂x holds all other variables constant while differentiating with respect to x. The wave equation uses ∂²y/∂t² and ∂²y/∂x² — acceleration in time and curvature in space.
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f0c040">Integrals — Accumulated Total</div>
+      <div class="card-body">
+        An integral ∫f(t)dt sums up contributions over an interval — the area under the curve.<br><br>
+        <code style="color:#f0c040;font-size:0.9em">∫[a→b] f(t) dt = lim[n→∞] Σᵢ f(tᵢ)·Δt</code><br><br>
+        Divide [a,b] into n slices of width Δt = (b−a)/n. Each slice has area f(tᵢ)·Δt. Sum all slices and take the limit as n→∞.<br><br>
+        <strong>Units:</strong> [∫f dt] = [f]·[t]. If f is velocity [m·s⁻¹], ∫v dt gives displacement [m].<br><br>
+        <strong>Fundamental Theorem of Calculus:</strong> if F′(x) = f(x), then ∫[a→b]f(x)dx = F(b)−F(a). Integration and differentiation are exact inverses. In wave physics: integrating d²ξ/dt² (acceleration) twice recovers ξ (displacement).
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#7090ff">Why sin and cos? — Solving the Oscillator</div>
+      <div class="card-body">
+        Hooke's law gives: m·d²x/dt² = −kx. Rearranging:<br>
+        <code style="color:#7090ff;font-size:0.9em">d²x/dt² = −(k/m)·x = −ω₀²·x</code><br>
+        where ω₀ = √(k/m) [rad·s⁻¹].<br><br>
+        We need a function whose second derivative equals −ω₀² times itself. The only real functions with this property are sine and cosine:<br>
+        d²/dt²[cos(ω₀t)] = −ω₀²·cos(ω₀t) ✓<br><br>
+        So the general solution is: <code style="color:#7090ff">x(t) = A·cos(ω₀t) + B·sin(ω₀t)</code><br>
+        or equivalently: x(t) = C·cos(ω₀t + φ)<br><br>
+        This is why every linear oscillating system produces sinusoidal motion — it is mathematically forced by the structure of the differential equation.
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f06050">Deriving the Wave Equation from F=ma</div>
+      <div class="card-body">
+        Consider an air element at position x, thickness dx, area A, density ρ. Its mass is dm = ρ·A·dx.<br><br>
+        Net pressure force: dF = −A·(∂P/∂x)·dx &nbsp;[N = Pa·m² = kg·m·s⁻²]<br>
+        Newton (F=ma): ρ·A·dx·(∂²ξ/∂t²) = −A·(∂P/∂x)·dx<br>
+        → <code style="color:#f06050">ρ·(∂²ξ/∂t²) = −∂P/∂x</code><br><br>
+        Bulk modulus definition: P = −B·(∂ξ/∂x), so ∂P/∂x = −B·(∂²ξ/∂x²)<br>
+        Substituting:<br>
+        <code style="color:#f06050">∂²ξ/∂t² = (B/ρ)·∂²ξ/∂x²</code> → v = √(B/ρ)<br><br>
+        <strong>Unit check:</strong> [B/ρ] = [Pa]/[kg·m⁻³] = [kg·m⁻¹·s⁻²]/[kg·m⁻³] = m²·s⁻²<br>
+        [√(B/ρ)] = m·s⁻¹ ✓
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#e080ff">Superposition — Linear Algebra of Waves</div>
+      <div class="card-body">
+        The wave equation ∂²y/∂t² = v²·∂²y/∂x² is <strong>linear</strong> — it contains no y², no (∂y/∂x)², no cross terms. For any linear equation L[y] = 0, if y₁ and y₂ are solutions, then c₁y₁ + c₂y₂ is also a solution:<br><br>
+        <code style="color:#e080ff">L[c₁y₁ + c₂y₂] = c₁L[y₁] + c₂L[y₂] = 0 + 0 = 0</code><br><br>
+        This is the <strong>principle of superposition</strong>. It holds for small amplitudes (pressure changes ≪ atmospheric pressure, ~101 kPa). At large amplitudes — explosions, sonic booms — nonlinear terms become significant, linearity breaks down, and superposition fails. This is why loud sounds distort and create new frequencies not in the source.
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#4af0c4">Fourier Series — Full Mathematics</div>
+      <div class="card-body">
+        Any periodic function y(t) with period T can be written exactly as:<br>
+        <code style="color:#4af0c4;font-size:0.85em">y(t) = A₀/2 + Σₙ[Aₙcos(2πnt/T) + Bₙsin(2πnt/T)]</code><br><br>
+        The coefficients are found by integration:<br>
+        Aₙ = (2/T)·∫₀ᵀ y(t)·cos(2πnt/T) dt<br>
+        Bₙ = (2/T)·∫₀ᵀ y(t)·sin(2πnt/T) dt<br><br>
+        <strong>Why does this work?</strong> Sine waves at different frequencies are <em>orthogonal</em>: ∫₀ᵀ sin(2πmt/T)·sin(2πnt/T)dt = 0 when m≠n. This means multiplying by cos(2πnt/T) and integrating cancels all frequencies except the n-th — isolating each harmonic independently. The magnitude of harmonic n is √(Aₙ²+Bₙ²), its phase is arctan(Bₙ/Aₙ).
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f0c040">Boundary Conditions — Mathematics</div>
+      <div class="card-body">
+        The wave equation alone has infinitely many solutions. Boundary conditions select which ones physically exist in a cavity.<br><br>
+        For a tube closed at x=0, open at x=L, the displacement ξ must satisfy:<br>
+        <code style="color:#f0c040">ξ(0,t) = 0</code> (rigid wall: no displacement)<br>
+        <code style="color:#f0c040">∂P/∂x|_{x=L} = 0</code> (open end: pressure = atmospheric, so ∂P/∂x = 0)<br><br>
+        Solutions satisfying both are: ξₙ(x,t) = Aₙ·sin(kₙx)·cos(ωₙt)<br>
+        where kₙ = (2n−1)π/(2L), n = 1,2,3...<br>
+        giving fₙ = (2n−1)·v/(4L)<br><br>
+        For your 17 cm vocal tract: f₁ = 343/(4×0.17) ≈ 504 Hz (F1). The odd harmonics only (1st, 3rd, 5th mode) — this is why a closed-open tube has a different harmonic series than an open-open tube.
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f06050">Decibels & Logarithms</div>
+      <div class="card-body">
+        <code style="color:#f06050">L = 10·log₁₀(I/I₀) &nbsp;[dB]</code><br>
+        I₀ = 10⁻¹² W·m⁻² (threshold of hearing)<br><br>
+        <strong>Why logarithms?</strong> log₁₀(x) is the exponent you raise 10 to in order to get x. log₁₀(1000) = 3 because 10³ = 1000. Each factor of 10 in intensity adds exactly 10 dB — a linear scale on a logarithmic axis.<br><br>
+        Conversation (~60 dB): I = 10⁻⁶ W·m⁻²<br>
+        Rock concert (~110 dB): I = 10⁻¹ W·m⁻²<br>
+        That's 100,000× more intensity — but only 50 dB difference.<br><br>
+        <strong>Why hearing uses log scale:</strong> the Weber-Fechner law — human perception of stimulus magnitude is proportional to the logarithm of physical intensity. We evolved to hear across an enormous dynamic range, not to measure absolute watts.
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="phys-section">
@@ -678,7 +784,7 @@ const physicsHTML = `
     Joseph Fourier (1768–1830) proved that <strong>any periodic signal — no matter how complex — can be expressed as a sum of sine waves</strong> at integer multiples of a fundamental frequency. This is not an approximation; it is an exact mathematical identity.
     <br><br>
     <strong>The formula:</strong><br>
-    <code style="color:#4af0c4">f(t) = A₀ + A₁sin(2πft) + A₂sin(4πft) + A₃sin(6πft) + ...</code>
+    <code style="color:#4af0c4">y(t) = A₀/2 + Σₙ[Aₙcos(2πnft) + Bₙsin(2πnft)]</code> &nbsp;<span style="color:#5a7a6a;font-size:0.85em">(full form; simplified to sin-only for odd functions)</span>
     <br><br>
     where f is the fundamental frequency, and A₁, A₂, A₃... are the amplitudes of each harmonic. The 2nd harmonic is at 2f, the 3rd at 3f, and so on.
     <br><br>
@@ -714,7 +820,7 @@ const physicsHTML = `
   <div class="phys-tag">Concept 03</div>
   <div class="phys-title">Wavelength, Frequency & Speed of Sound</div>
   <div class="phys-body">
-    <strong>speed = frequency × wavelength</strong>. At room temperature (~20°C), the speed of sound in air is ~343 m/s — so higher frequency = shorter wavelength. (Concept 03b explains why this varies with temperature and medium.) Your vocal tract (~17 cm) resonates at wavelengths that physically fit inside it — typically 500–3000 Hz.
+    <strong>v = f · λ</strong> &nbsp;<span style="color:#5a7a6a;font-size:0.85em">[v] = m·s⁻¹ | [f] = Hz = s⁻¹ | [λ] = m → [f·λ] = s⁻¹·m = m·s⁻¹ ✓</span>. At room temperature (~20°C), the speed of sound in air is ~343 m/s — so higher frequency = shorter wavelength. (Concept 03b explains why this varies with temperature and medium.) Your vocal tract (~17 cm) resonates at wavelengths that physically fit inside it — typically 500–3000 Hz.
   </div>
   <canvas id="pd_wavelength" class="pdiag" height="130"></canvas>
   <div class="phys-analogy">A guitar string resonates only at wavelengths that "fit" between its endpoints. Your vocal tract is the same — a tube with preferred frequencies determined by its length.</div>
@@ -728,11 +834,11 @@ const physicsHTML = `
     <br><br>
     Two properties of the medium govern it:
     <br><br>
-    <strong>1. Elasticity (restoring force)</strong> — how strongly the medium "wants" to spring back after being compressed. A stiffer medium pushes molecules back faster → sound travels faster. Steel is very stiff → very fast. Air is very compressible → slower.
+    <strong>1. Elasticity — Bulk Modulus B</strong> [Pa = kg·m⁻¹·s⁻²]: how strongly the medium resists compression and springs back. Formally: B = −V·(dP/dV), the fractional volume change per unit pressure. Higher B = stiffer = faster sound. Steel: B ≈ 160 GPa. Water: B ≈ 2.2 GPa. Air: B ≈ 142 kPa.
     <br><br>
-    <strong>2. Inertia (density)</strong> — the mass per unit volume of the medium (kg/m³). A denser medium has more mass in each volume element that the wave must accelerate, which slows propagation. This is why helium conducts sound faster than air (~972 m/s) — helium's density is far lower than air's (0.16 vs 1.2 kg/m³ at 20°C). Lower density per unit volume = less inertia to overcome = faster wave.
+    <strong>2. Inertia — Density ρ</strong> [kg·m⁻³ = kg per cubic metre]: mass per unit volume. Each volume element of the medium has mass ρ·dV that the wave must accelerate (F = ma). Higher ρ = more inertia = slower wave. Helium at 20°C: ρ ≈ 0.164 kg·m⁻³. Air at 20°C: ρ ≈ 1.204 kg·m⁻³. Water: ρ ≈ 998 kg·m⁻³. Steel: ρ ≈ 7800 kg·m⁻³.<br><br><strong>Speed formula with units:</strong> v = √(B/ρ) &nbsp;<span style="color:#5a7a6a">[v] = √(kg·m⁻¹·s⁻² / kg·m⁻³) = √(m²·s⁻²) = m·s⁻¹ ✓</span>
     <br><br>
-    In air, the formula is: <strong>v = √(γP/ρ)</strong> — where γ is the adiabatic index (how air responds to compression), P is air pressure, and ρ is air density. For an ideal gas, the ideal gas law gives P/ρ = RT/M (R = gas constant, T = temperature, M = molar mass). Substituting into the formula gives <strong>v = √(γRT/M)</strong> — pressure drops out entirely. Speed depends only on <strong>temperature and gas composition</strong>, not on pressure.
+    In air, the formula is: <strong>v = √(γP/ρ)</strong> — where γ is the adiabatic index (how air responds to compression), P is air pressure, and ρ is air density. For an ideal gas, the ideal gas law gives P/ρ = RT/M (R = gas constant, T = temperature, M = molar mass). Substituting into the formula gives <strong>v = √(γRT/M)</strong> &nbsp;<span style="color:#5a7a6a;font-size:0.85em">[v] = m·s⁻¹ | γ dimensionless | R = 8.314 J·mol⁻¹·K⁻¹ | T in K | M = kg·mol⁻¹ → [RT/M] = m²·s⁻² → [√(γRT/M)] = m·s⁻¹ ✓</span><br>Pressure drops out entirely. Speed depends only on <strong>temperature and gas composition</strong>, not on pressure.
     <br><br>
     The rule of thumb: <strong>speed increases by ~0.6 m/s for every 1°C rise in temperature</strong>. Warmer air → faster-moving molecules → they transmit the pressure disturbance more quickly.
   </div>
