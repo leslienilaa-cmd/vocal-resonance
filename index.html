@@ -565,10 +565,142 @@ const physicsHTML = `
 </div>
 
 <div class="phys-section">
+  <div class="phys-tag">Concept 01b</div>
+  <div class="phys-title">What is Hertz? Frequency, Period & Units</div>
+  <div class="phys-body">
+    <strong>Frequency</strong> (symbol <em>f</em>) measures how many complete cycles of a repeating event occur per second. Its SI unit is the <strong>Hertz (Hz)</strong>, named after physicist Heinrich Hertz (1857–1894).
+    <br><br>
+    <strong>The formula:</strong><br>
+    <code style="color:#4af0c4;font-size:1.05em">f = 1 / T</code>
+    <br><br>
+    where <strong>T</strong> is the <strong>period</strong> — the time (in seconds) for one complete cycle to occur. They are exact inverses of each other.
+    <br><br>
+    <strong>Units broken down:</strong><br>
+    1 Hz = 1 cycle per second = 1 s⁻¹ (one per second)<br>
+    The "cycle" is dimensionless — it's a count, not a physical quantity — so Hertz reduces to simply s⁻¹ in SI base units. The unit carries the name Hz for clarity.
+    <br><br>
+    <strong>Worked examples:</strong><br>
+    • A sound wave at <strong>440 Hz</strong>: T = 1/440 ≈ <strong>0.00227 s</strong> per cycle (2.27 milliseconds)<br>
+    • A sound wave at <strong>100 Hz</strong>: T = 1/100 = <strong>0.01 s</strong> per cycle (10 milliseconds)<br>
+    • Your vocal folds at <strong>120 Hz</strong>: they open and close <strong>120 times every second</strong>
+    <br><br>
+    <strong>Related quantities:</strong><br>
+    <strong>Angular frequency</strong> ω = 2πf (radians per second) — used in wave equations because rotation and oscillation share the same mathematics. One complete cycle = 2π radians.<br>
+    <strong>Wavelength</strong> λ = v/f — how far the wave travels in one period at speed v.
+    <br><br>
+    <strong>Why "cycles per second" and not just "per second"?</strong><br>
+    Strictly speaking, Hz = s⁻¹. But saying "120 per second" is ambiguous — per second of what? Adding "cycles" (even though it's dimensionless) makes the physical meaning clear: 120 complete oscillations happening every second.
+  </div>
+  <canvas id="pd_hertz" class="pdiag" height="130"></canvas>
+  <div class="pleg">
+    <span><b style="color:#f0c040">—</b> 100 Hz: T = 10 ms per cycle</span>
+    <span><b style="color:#4af0c4">—</b> 440 Hz: T = 2.27 ms per cycle</span>
+    <span><b style="color:#f06050">←T→</b> period = time for one complete cycle</span>
+  </div>
+  <div class="phys-analogy">A clock ticks at 1 Hz — one complete tick-tock per second, period T = 1 s. Middle C on a piano vibrates at 261.6 Hz — 261.6 complete oscillations per second, period T = 3.8 ms. Your voice at 120 Hz sits between them, completing a cycle every 8.3 milliseconds.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 01c</div>
+  <div class="phys-title">What is Missing to Understand Sound from First Principles?</div>
+  <div class="phys-body">
+    This visualizer explains <em>what</em> sound does. To understand <em>why</em> — to derive it from scratch — you need a small set of foundational ideas. Each one unlocks a deeper layer:
+  </div>
+  <div class="concept-grid" style="margin-top:12px">
+    <div class="concept-card">
+      <div class="card-term" style="color:#4af0c4">F = ma — Newton's 2nd Law</div>
+      <div class="card-body">Sound propagation is molecules pushing each other. Each push accelerates the next molecule (F = ma), which then pushes its neighbor. This chain reaction IS the wave. Without Newton's 2nd law, there is no mechanism for sound to travel at all.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f0c040">F = −kx — Hooke's Law</div>
+      <div class="card-body">Compressed molecules spring back. The restoring force is proportional to displacement (F = −kx). This is what makes the motion oscillatory rather than a one-time shove. It's the "spring" between every pair of adjacent molecules in the medium.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#7090ff">The Wave Equation</div>
+      <div class="card-body">Combining F = ma with Hooke's Law gives: <strong>∂²y/∂t² = v² · ∂²y/∂x²</strong>. This single equation predicts all wave behavior — propagation, reflection, superposition, resonance. The speed v = √(bulk modulus / density) falls directly out of it.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f06050">Superposition Principle</div>
+      <div class="card-body">Waves add linearly — two waves at the same point simply sum their amplitudes. This is not obvious; it's a property of <em>linear</em> systems. Without it: no interference, no standing waves, no formants, no harmonic series. When sound gets loud enough to distort, it's because linearity breaks down.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#e080ff">Fourier's Theorem</div>
+      <div class="card-body">Any periodic signal can be decomposed into a sum of sinusoids at integer multiples of a fundamental frequency. This is why your voice has harmonics, why formants amplify specific frequencies, and why your cochlea can separate them. Your ear performs a biological Fourier transform on every sound it receives.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#4af0c4">Boundary Conditions</div>
+      <div class="card-body">What happens at the edges of a medium determines everything about resonance. A rigid wall forces zero displacement (pressure antinode). An open end forces zero pressure variation (pressure node). These constraints select which wavelengths can form stable standing waves in any cavity — including your vocal tract.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f0c040">Ideal Gas Law — PV = nRT</div>
+      <div class="card-body">Pressure in air is molecular collisions. Temperature is average molecular kinetic energy. The ideal gas law (PV = nRT) connects them. Combined with the wave equation, it gives v = √(γRT/M) — explaining why speed depends on temperature and gas composition, not pressure alone.</div>
+    </div>
+    <div class="concept-card">
+      <div class="card-term" style="color:#f06050">Energy & Inverse Square Law</div>
+      <div class="card-body">Sound intensity (power per unit area) drops as 1/r² in open space because energy spreads over an ever-growing spherical surface. This explains why sound fades with distance, and why decibels use a logarithmic scale — human hearing spans a 10-trillion-fold range of intensity.</div>
+    </div>
+  </div>
+  <div class="phys-body" style="margin-top:14px">
+    <strong>The dependency chain:</strong> Newton + Hooke → Wave Equation → Superposition + Boundary Conditions → Standing Waves + Resonance → Formants → Your Voice. Every concept on this page is downstream of that chain. Fourier Analysis is the mathematical language that makes it all computable. The Ideal Gas Law grounds the speed of sound in molecular reality.
+  </div>
+  <div class="phys-analogy">You don't need all of this to use or appreciate acoustics — just as you don't need fluid dynamics to swim. But knowing the chain reveals that vocal resonance is not magic or biology-specific: it is Newton's laws, applied to air, shaped by geometry.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 01d</div>
+  <div class="phys-title">Superposition — Why Waves Can Pass Through Each Other</div>
+  <div class="phys-body">
+    Two sound waves occupying the same space at the same time simply <strong>add their pressures together</strong> at every point. After passing through each other, each wave continues unchanged. This is the <strong>superposition principle</strong>, and it is the foundation of everything that happens in your vocal tract.
+    <br><br>
+    <strong>Why it works:</strong> The wave equation is linear — it contains no squared or multiplied wave terms. Linear equations obey superposition mathematically. If y₁ and y₂ are each solutions, then y₁ + y₂ is also a solution. Physically, this holds as long as pressure variations are small relative to atmospheric pressure (which is true for normal sound — a loud conversation causes pressure changes of ~1 Pascal against atmospheric ~101,000 Pa).
+    <br><br>
+    <strong>When it breaks:</strong> Very loud sounds (explosions, sonic booms) produce large enough pressure changes that air behaves non-linearly — waves then distort and create new frequencies not in the original source. This is also why overdriven speakers and amplifiers produce harmonic distortion.
+    <br><br>
+    <strong>What it makes possible:</strong><br>
+    • <strong>Interference</strong>: waves adding constructively (louder) or destructively (quieter)<br>
+    • <strong>Standing waves</strong>: a wave plus its reflection, superimposed, creates a stationary pattern<br>
+    • <strong>Harmonics</strong>: multiple frequencies coexist in your voice without disturbing each other<br>
+    • <strong>Formants</strong>: the vocal tract can simultaneously resonate at F1, F2, F3 — all independently
+  </div>
+  <canvas id="pd_superposition" class="pdiag" height="140"></canvas>
+  <div class="pleg">
+    <span><b style="color:#7090ff">—</b> Wave A</span>
+    <span><b style="color:#f06050">—</b> Wave B</span>
+    <span><b style="color:#4af0c4">—</b> A + B (superposition)</span>
+  </div>
+  <div class="phys-analogy">Drop two stones in a pond. The ripples pass through each other without interaction — each continues as if the other didn't exist. Where they overlap, the water surface height is simply the sum of both ripples. Sound in air works identically.</div>
+</div>
+
+<div class="phys-section">
+  <div class="phys-tag">Concept 01e</div>
+  <div class="phys-title">Fourier's Theorem — Why Your Voice Has Harmonics</div>
+  <div class="phys-body">
+    Joseph Fourier (1768–1830) proved that <strong>any periodic signal — no matter how complex — can be expressed as a sum of sine waves</strong> at integer multiples of a fundamental frequency. This is not an approximation; it is an exact mathematical identity.
+    <br><br>
+    <strong>The formula:</strong><br>
+    <code style="color:#4af0c4">f(t) = A₀ + A₁sin(2πft) + A₂sin(4πft) + A₃sin(6πft) + ...</code>
+    <br><br>
+    where f is the fundamental frequency, and A₁, A₂, A₃... are the amplitudes of each harmonic. The 2nd harmonic is at 2f, the 3rd at 3f, and so on.
+    <br><br>
+    <strong>Applied to your voice:</strong> your vocal folds vibrate at your pitch frequency (say 120 Hz). But they don't produce a pure sine wave — they produce a sharp, asymmetric pulse each time they snap shut. Fourier's theorem says this pulse is equivalent to sine waves at 120 Hz + 240 Hz + 360 Hz + 480 Hz... (all harmonics). Your vocal tract then amplifies whichever of these happen to fall near a formant frequency.
+    <br><br>
+    <strong>Why your ear can separate them:</strong> the basilar membrane physically performs Fourier decomposition — different locations respond to different frequencies. The neural signal your brain receives is already a frequency-domain representation, not a time-domain waveform.
+  </div>
+  <canvas id="pd_fourier" class="pdiag" height="150"></canvas>
+  <div class="pleg">
+    <span><b style="color:#7090ff">—</b> Fundamental (f)</span>
+    <span><b style="color:#f06050">—</b> 2nd harmonic (2f)</span>
+    <span><b style="color:#f0c040">—</b> 3rd harmonic (3f)</span>
+    <span><b style="color:#4af0c4">—</b> Sum (what you actually hear)</span>
+  </div>
+  <div class="phys-analogy">A chord on a piano has three notes played simultaneously. Your ear hears them as three separate pitches — not a single combined sound. Fourier's theorem is why this is possible: the combined pressure wave in the air truly IS the mathematical sum of three pure tones, and your cochlea reverses the sum back into its components.</div>
+</div>
+
+<div class="phys-section">
   <div class="phys-tag">Concept 02</div>
   <div class="phys-title">Why Does Higher Frequency Mean Higher Pitch?</div>
   <div class="phys-body">
-    <strong>Frequency</strong> = how many pressure cycles per second, measured in <strong>Hertz (Hz)</strong>. Your ear's cochlea has hair cells tuned to different frequencies — high-frequency cells at the entrance, low-frequency cells deep inside. Your brain reads which cells fire and interprets that as pitch. Higher frequency = faster oscillation = different hair cells = higher pitch. Simple physical mapping.
+    <strong>Frequency</strong> = how many pressure cycles per second, measured in <strong>Hertz (Hz)</strong>. Inside your ear, the <strong>basilar membrane</strong> — a tapered structure inside the fluid-filled cochlea — vibrates at different locations depending on frequency: high frequencies excite the base (entrance), low frequencies excite the apex (far end). Hair cells sitting on the basilar membrane convert this mechanical vibration into neural signals. Your brain reads which cells fire and interprets that as pitch. Higher frequency = faster oscillation = different hair cells = higher pitch. Simple physical mapping.
   </div>
   <canvas id="pd_freqs" class="pdiag" height="120"></canvas>
   <div class="pleg">
@@ -652,7 +784,7 @@ const physicsHTML = `
     </div>
   </div>
   <div class="phys-body" style="margin-top:10px">Antinode → node distance = exactly <strong>¼ wavelength</strong>. For your 17 cm vocal tract, the first mode has antinode at vocal folds, node at lips → quarter wavelength ~68 cm → ~500 Hz = your first formant F1.</div>
-  <div class="phys-analogy">On a guitar string you can actually <em>see</em> the standing wave. In your vocal tract it's the same invisible pattern of pressure, oscillating dozens of times per second.</div>
+  <div class="phys-analogy">On a guitar string you can see a standing wave — but note: a string has <em>displacement</em> nodes at its fixed ends and displacement antinodes in the middle. In a sound wave, the roles are inverted: a pressure antinode forms at the closed end, and a pressure node at the open end. Both are standing waves obeying the same wave equation — just measured in different physical quantities.</div>
 </div>
 
 <hr class="phys-divider">
@@ -1158,6 +1290,168 @@ function startPhysicsAnims() {
       ['0','1k','2k','3k Hz'].forEach((lbl,i)=>{
         const x=mx+(i/3)*pw;
         fc.fillText(lbl,x-4,my+ph+12);
+      });
+      t++;
+      physicsAnimFrames.push(requestAnimationFrame(frame));
+    }
+    frame();
+  })();
+
+  // --- 0b. HERTZ / PERIOD diagram ---
+  (function() {
+    const hc = getCtx('pd_hertz', 130);
+    if (!hc) return;
+    const W = hc._W, H = hc._H;
+    let t = 0;
+    function frame() {
+      if (!physicsAnimating) return;
+      hc.fillStyle = '#0d1318'; hc.fillRect(0,0,W,H);
+      const midTop = H*0.28, midBot = H*0.72;
+      // Divider
+      hc.strokeStyle = '#1e2530'; hc.lineWidth = 1;
+      hc.beginPath(); hc.moveTo(0,H/2); hc.lineTo(W,H/2); hc.stroke();
+      // 100 Hz wave (low freq, slow)
+      const f1cycles = 3.5;
+      hc.beginPath();
+      for (let x=0; x<=W; x++) {
+        const y = midTop + Math.sin((x/W)*Math.PI*2*f1cycles - t*0.025) * H*0.17;
+        x===0?hc.moveTo(x,y):hc.lineTo(x,y);
+      }
+      hc.strokeStyle='#f0c040'; hc.lineWidth=2.5;
+      hc.shadowBlur=5; hc.shadowColor='#f0c040'; hc.stroke(); hc.shadowBlur=0;
+      // Period bracket for 100 Hz (one cycle)
+      const cycleW1 = W/f1cycles;
+      const bracketY1 = midTop - H*0.18;
+      hc.strokeStyle='rgba(240,192,64,0.6)'; hc.lineWidth=1;
+      hc.beginPath(); hc.moveTo(0,bracketY1); hc.lineTo(cycleW1,bracketY1); hc.stroke();
+      hc.beginPath(); hc.moveTo(0,bracketY1-4); hc.lineTo(0,bracketY1+4); hc.stroke();
+      hc.beginPath(); hc.moveTo(cycleW1,bracketY1-4); hc.lineTo(cycleW1,bracketY1+4); hc.stroke();
+      hc.fillStyle='#f0c040'; hc.font='bold 8px Space Mono,monospace'; hc.textAlign='center';
+      hc.fillText('T = 10 ms  (f = 100 Hz)', cycleW1/2, bracketY1-6);
+      // 440 Hz wave (high freq, fast)
+      const f2cycles = 14;
+      hc.beginPath();
+      for (let x=0; x<=W; x++) {
+        const y = midBot + Math.sin((x/W)*Math.PI*2*f2cycles - t*0.10) * H*0.14;
+        x===0?hc.moveTo(x,y):hc.lineTo(x,y);
+      }
+      hc.strokeStyle='#4af0c4'; hc.lineWidth=2.5;
+      hc.shadowBlur=5; hc.shadowColor='#4af0c4'; hc.stroke(); hc.shadowBlur=0;
+      // Period bracket for 440 Hz
+      const cycleW2 = W/f2cycles;
+      const bracketY2 = midBot + H*0.20;
+      hc.strokeStyle='rgba(74,240,196,0.6)'; hc.lineWidth=1;
+      hc.beginPath(); hc.moveTo(0,bracketY2); hc.lineTo(cycleW2,bracketY2); hc.stroke();
+      hc.beginPath(); hc.moveTo(0,bracketY2-4); hc.lineTo(0,bracketY2+4); hc.stroke();
+      hc.beginPath(); hc.moveTo(cycleW2,bracketY2-4); hc.lineTo(cycleW2,bracketY2+4); hc.stroke();
+      hc.fillStyle='#4af0c4'; hc.font='bold 8px Space Mono,monospace';
+      hc.fillText('T = 2.27 ms  (f = 440 Hz)', cycleW2/2+4, bracketY2+12);
+      hc.textAlign='left';
+      // Labels
+      hc.fillStyle='#f0c040'; hc.font='bold 8px Space Mono,monospace';
+      hc.fillText('100 Hz — deep', 4, midTop-2);
+      hc.fillStyle='#4af0c4';
+      hc.fillText('440 Hz — concert A', 4, midBot-2);
+      hc.fillStyle='#3a5060'; hc.font='7px Space Mono,monospace';
+      hc.fillText('f = 1/T', W-52, H-6);
+      t++;
+      physicsAnimFrames.push(requestAnimationFrame(frame));
+    }
+    frame();
+  })();
+
+  // --- 0c. SUPERPOSITION diagram ---
+  (function() {
+    const sc = getCtx('pd_superposition', 140);
+    if (!sc) return;
+    const W = sc._W, H = sc._H;
+    let t = 0;
+    function frame() {
+      if (!physicsAnimating) return;
+      sc.fillStyle='#0d1318'; sc.fillRect(0,0,W,H);
+      const third = H/3;
+      // dividers
+      sc.strokeStyle='#1e2530'; sc.lineWidth=0.7;
+      sc.beginPath(); sc.moveTo(0,third); sc.lineTo(W,third); sc.stroke();
+      sc.beginPath(); sc.moveTo(0,third*2); sc.lineTo(W,third*2); sc.stroke();
+      // Wave A (fundamental)
+      const drawWave = (freq, amp, midY, color, label) => {
+        sc.beginPath();
+        for (let x=0; x<=W; x++) {
+          const y = midY + Math.sin((x/W)*Math.PI*2*freq - t*0.04) * amp;
+          x===0?sc.moveTo(x,y):sc.lineTo(x,y);
+        }
+        sc.strokeStyle=color; sc.lineWidth=2;
+        sc.shadowBlur=5; sc.shadowColor=color; sc.stroke(); sc.shadowBlur=0;
+        sc.fillStyle=color; sc.font='bold 8px Space Mono,monospace';
+        sc.fillText(label, 4, midY-amp-4);
+      };
+      drawWave(3, third*0.35, third*0.5, '#7090ff', 'Wave A (f)');
+      drawWave(5, third*0.28, third*1.5, '#f06050', 'Wave B (1.67f)');
+      // Sum wave
+      sc.beginPath();
+      for (let x=0; x<=W; x++) {
+        const a = Math.sin((x/W)*Math.PI*2*3 - t*0.04) * third*0.35;
+        const b = Math.sin((x/W)*Math.PI*2*5 - t*0.04) * third*0.28;
+        const y = third*2.5 + (a+b)*0.65;
+        x===0?sc.moveTo(x,y):sc.lineTo(x,y);
+      }
+      sc.strokeStyle='#4af0c4'; sc.lineWidth=2.5;
+      sc.shadowBlur=8; sc.shadowColor='#4af0c4'; sc.stroke(); sc.shadowBlur=0;
+      sc.fillStyle='#4af0c4'; sc.font='bold 8px Space Mono,monospace';
+      sc.fillText('A + B (superposition)', 4, third*2+10);
+      t++;
+      physicsAnimFrames.push(requestAnimationFrame(frame));
+    }
+    frame();
+  })();
+
+  // --- 0d. FOURIER diagram ---
+  (function() {
+    const fc = getCtx('pd_fourier', 150);
+    if (!fc) return;
+    const W = fc._W, H = fc._H;
+    let t = 0;
+    function frame() {
+      if (!physicsAnimating) return;
+      fc.fillStyle='#0d1318'; fc.fillRect(0,0,W,H);
+      const midY = H*0.5;
+      const amp1 = H*0.18, amp2 = H*0.10, amp3 = H*0.07;
+      const freq = 2.5;
+      // Harmonics
+      const drawH = (n, amp, color) => {
+        fc.beginPath();
+        for (let x=0; x<=W; x++) {
+          const y = midY + Math.sin((x/W)*Math.PI*2*freq*n - t*0.04*n) * amp;
+          x===0?fc.moveTo(x,y):fc.lineTo(x,y);
+        }
+        fc.strokeStyle=color; fc.lineWidth=1.8;
+        fc.shadowBlur=4; fc.shadowColor=color; fc.stroke(); fc.shadowBlur=0;
+      };
+      drawH(1, amp1, '#7090ff');
+      drawH(2, amp2, '#f06050');
+      drawH(3, amp3, '#f0c040');
+      // Sum
+      fc.beginPath();
+      for (let x=0; x<=W; x++) {
+        const y = midY +
+          Math.sin((x/W)*Math.PI*2*freq   - t*0.04  ) * amp1 +
+          Math.sin((x/W)*Math.PI*2*freq*2 - t*0.08  ) * amp2 +
+          Math.sin((x/W)*Math.PI*2*freq*3 - t*0.12  ) * amp3;
+        x===0?fc.moveTo(x,y):fc.lineTo(x,y);
+      }
+      fc.strokeStyle='#4af0c4'; fc.lineWidth=2.8;
+      fc.shadowBlur=10; fc.shadowColor='#4af0c4'; fc.stroke(); fc.shadowBlur=0;
+      // Labels
+      const labels = [
+        {color:'#7090ff', text:'f — fundamental'},
+        {color:'#f06050', text:'2f — 2nd harmonic'},
+        {color:'#f0c040', text:'3f — 3rd harmonic'},
+        {color:'#4af0c4', text:'f+2f+3f — complex wave (what you hear)'},
+      ];
+      labels.forEach((l,i) => {
+        fc.fillStyle=l.color; fc.font=`${i===3?'bold ':''  }8px Space Mono,monospace`;
+        fc.fillText(l.text, 4, H-44+i*11);
       });
       t++;
       physicsAnimFrames.push(requestAnimationFrame(frame));
