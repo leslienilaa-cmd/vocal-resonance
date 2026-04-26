@@ -383,9 +383,9 @@
       <div class="section-label">Vowel Preset</div>
       <div class="vowel-grid">
         <button class="vowel-btn active" data-vowel="a">A<small>as in "far"</small></button>
-        <button class="vowel-btn" data-vowel="e">E<small>as in "hey"</small></button>
+        <button class="vowel-btn" data-vowel="e">E<small>as in "bed"</small></button>
         <button class="vowel-btn" data-vowel="i">I<small>as in "see"</small></button>
-        <button class="vowel-btn" data-vowel="o">O<small>as in "go"</small></button>
+        <button class="vowel-btn" data-vowel="o">O<small>as in "law"</small></button>
         <button class="vowel-btn" data-vowel="u">U<small>as in "who"</small></button>
         <button class="vowel-btn" data-vowel="hum">♩<small>humming</small></button>
       </div>
@@ -472,10 +472,10 @@ let state = {
 
 // Vowel presets: [F1, F2, tonguePos, mouthOpen, label]
 const vowels = {
-  a:   { f1: 800,  f2: 1200, tongue: 0.2, mouth: 0.75, info: '<strong>Vowel /a/</strong>: Low tongue, wide open mouth. Low F1 (~800Hz), low F2. Large open cavity with minimal constriction.' },
-  e:   { f1: 550,  f2: 1900, tongue: 0.65, mouth: 0.45, info: '<strong>Vowel /e/</strong>: Mid tongue raised front, moderate mouth. Higher F2 from front cavity resonance.' },
+  a:   { f1: 800,  f2: 1200, tongue: 0.2, mouth: 0.75, info: '<strong>Vowel /a/</strong>: Low tongue, wide open mouth. High F1 (~800 Hz) — /a/ has the highest F1 of all vowels. Mid F2 (~1200 Hz). Large open cavity with minimal constriction.' },
+  e:   { f1: 550,  f2: 1900, tongue: 0.65, mouth: 0.45, info: '<strong>Vowel /e/</strong>: Mid-high front tongue, moderate jaw opening. F1 ~480 Hz (mid-close), F2 ~1800 Hz (front resonance). The raised front tongue shortens the front cavity, pushing F2 up.' },
   i:   { f1: 300,  f2: 2300, tongue: 0.85, mouth: 0.25, info: '<strong>Vowel /i/</strong>: High front tongue, small opening. Very high F2 (~2300Hz) — the front cavity is tiny, raising resonance dramatically.' },
-  o:   { f1: 500,  f2: 900,  tongue: 0.3, mouth: 0.55, info: '<strong>Vowel /o/</strong>: Back tongue, rounded lips. Low F2 — the back cavity and lip rounding lower resonant frequencies.' },
+  o:   { f1: 500,  f2: 900,  tongue: 0.3, mouth: 0.55, info: '<strong>Vowel /o/</strong>: Back tongue, open-mid jaw. F1 ~500 Hz, low F2 ~900 Hz — the back tongue placement and open jaw produce the characteristic "aw" quality. Note: pure /o/ is rare in English; most English "o" sounds are diphthongs.' },
   u:   { f1: 320,  f2: 700,  tongue: 0.75, mouth: 0.15, info: '<strong>Vowel /u/</strong>: High back tongue, very rounded small lips. Lowest F2 of all vowels. Lip rounding is a powerful resonance shaper.' },
   hum: { f1: 250,  f2: 600,  tongue: 0.5,  mouth: 0.02, info: '<strong>Humming</strong>: Closed lips. Sound exits through nasal cavity only. Nasal resonators dominate — you feel the buzz in your face and skull.' },
 };
@@ -582,7 +582,7 @@ const physicsHTML = `
   <div class="phys-tag">Concept 03</div>
   <div class="phys-title">Wavelength, Frequency & Speed of Sound</div>
   <div class="phys-body">
-    <strong>speed = frequency × wavelength</strong>. Speed of sound is fixed at ~343 m/s, so higher frequency = shorter wavelength. Your vocal tract (~17 cm) resonates at wavelengths that physically fit inside it — typically 500–3000 Hz.
+    <strong>speed = frequency × wavelength</strong>. At room temperature (~20°C), the speed of sound in air is ~343 m/s — so higher frequency = shorter wavelength. (Concept 03b explains why this varies with temperature and medium.) Your vocal tract (~17 cm) resonates at wavelengths that physically fit inside it — typically 500–3000 Hz.
   </div>
   <canvas id="pd_wavelength" class="pdiag" height="130"></canvas>
   <div class="phys-analogy">A guitar string resonates only at wavelengths that "fit" between its endpoints. Your vocal tract is the same — a tube with preferred frequencies determined by its length.</div>
@@ -598,9 +598,9 @@ const physicsHTML = `
     <br><br>
     <strong>1. Elasticity (restoring force)</strong> — how strongly the medium "wants" to spring back after being compressed. A stiffer medium pushes molecules back faster → sound travels faster. Steel is very stiff → very fast. Air is very compressible → slower.
     <br><br>
-    <strong>2. Inertia (density)</strong> — how heavy the molecules are. Heavier molecules are harder to accelerate, so the wave propagates more slowly. This is why helium (very light molecules) conducts sound faster than air (~927 m/s), making your voice sound high-pitched — the wavelengths shorten while your vocal folds still vibrate at the same frequency.
+    <strong>2. Inertia (density)</strong> — the mass per unit volume of the medium (kg/m³). A denser medium has more mass in each volume element that the wave must accelerate, which slows propagation. This is why helium conducts sound faster than air (~972 m/s) — helium's density is far lower than air's (0.16 vs 1.2 kg/m³ at 20°C). Lower density per unit volume = less inertia to overcome = faster wave.
     <br><br>
-    In air, the formula is: <strong>v = √(γP/ρ)</strong> — where γ is the adiabatic index (how air responds to compression), P is air pressure, and ρ is air density. At a given temperature, pressure and density change together proportionally, so they cancel out — leaving speed determined almost entirely by <strong>temperature alone</strong>.
+    In air, the formula is: <strong>v = √(γP/ρ)</strong> — where γ is the adiabatic index (how air responds to compression), P is air pressure, and ρ is air density. For an ideal gas, the ideal gas law gives P/ρ = RT/M (R = gas constant, T = temperature, M = molar mass). Substituting into the formula gives <strong>v = √(γRT/M)</strong> — pressure drops out entirely. Speed depends only on <strong>temperature and gas composition</strong>, not on pressure.
     <br><br>
     The rule of thumb: <strong>speed increases by ~0.6 m/s for every 1°C rise in temperature</strong>. Warmer air → faster-moving molecules → they transmit the pressure disturbance more quickly.
   </div>
@@ -609,12 +609,12 @@ const physicsHTML = `
     <span><b style="color:#4af0c4">●</b> Cold air (0°C) — 331 m/s</span>
     <span><b style="color:#f0c040">●</b> Room temp (20°C) — 343 m/s</span>
     <span><b style="color:#f06050">●</b> Body temp (37°C) — 353 m/s</span>
-    <span><b style="color:#e080ff">●</b> Helium (20°C) — 927 m/s</span>
+    <span><b style="color:#e080ff">●</b> Helium (20°C) — 972 m/s</span>
   </div>
   <div class="phys-body" style="margin-top:4px">
     Inside your vocal tract, the air is warmed to near body temperature (~35°C), so sound actually travels at about <strong>352 m/s</strong> — slightly faster than in the room around you. This shifts your formant frequencies up slightly compared to a cold open tube of the same length.
   </div>
-  <div class="phys-analogy">Why does helium make your voice sound high? The speed of sound in helium is ~2.7× faster than in air. Faster speed + same vocal tract length = formants shift up to ~2.7× higher frequencies. Your vocal folds still buzz at the same pitch — only the resonances change. It sounds "squeaky" because F1 and F2 shoot up dramatically.</div>
+  <div class="phys-analogy">Why does helium make your voice sound high? The speed of sound in helium is ~2.8× faster than in air (972 vs 343 m/s). Faster speed + same vocal tract length = formants shift up ~2.8× in frequency. Your vocal folds still buzz at the same pitch — only the resonances change. It sounds "squeaky" because F1 and F2 shoot up dramatically.</div>
 </div>
 
 <hr class="phys-divider">
@@ -624,7 +624,7 @@ const physicsHTML = `
   <div class="phys-tag">Concept 04</div>
   <div class="phys-title">What is Resonance?</div>
   <div class="phys-body">
-    When a wave reflects back and forth inside a cavity and its reflections arrive back <em>in phase</em> (lined up) with the new outgoing wave, the energy <strong>builds up dramatically</strong> — resonance. At other frequencies, reflections arrive out of phase and cancel. Resonance is a natural bandpass filter: certain frequencies are amplified, others suppressed.
+    When a wave reflects back and forth inside a cavity and its reflections arrive back <em>in phase</em> (lined up) with the new outgoing wave, the energy <strong>builds up dramatically</strong> — resonance. At other frequencies, reflections arrive out of phase and cancel. Resonance acts as a natural frequency selector: certain frequencies are strongly amplified (resonant modes), others are suppressed. A cavity like the vocal tract has multiple resonant modes, each amplifying a different frequency band — these are what we call formants.
   </div>
   <canvas id="pd_resonance" class="pdiag" height="140"></canvas>
   <div class="pleg">
@@ -648,7 +648,7 @@ const physicsHTML = `
     </div>
     <div class="concept-card">
       <div class="card-term" style="color:#f06050">● Pressure Node</div>
-      <div class="card-body"><strong>Zero pressure variation</strong> — pressure stays constant at atmospheric. Molecules here move <em>most</em>, but cancel each other's pressure. Forms at <strong>open ends</strong> — air escapes freely so pressure equalizes. Shown in <strong style="color:#f06050">red</strong>.</div>
+      <div class="card-body"><strong>Zero pressure variation</strong> — pressure stays constant at atmospheric. Molecules here have maximum <em>displacement</em> — they oscillate freely with nothing to stop them. But because the end is open, any pressure build-up instantly vents outward and equalizes, so net pressure variation is zero. Forms at <strong>open ends</strong>. Shown in <strong style="color:#f06050">red</strong>.</div>
     </div>
   </div>
   <div class="phys-body" style="margin-top:10px">Antinode → node distance = exactly <strong>¼ wavelength</strong>. For your 17 cm vocal tract, the first mode has antinode at vocal folds, node at lips → quarter wavelength ~68 cm → ~500 Hz = your first formant F1.</div>
@@ -666,7 +666,7 @@ const physicsHTML = `
     <br><br>
     <strong>F1</strong> (~250–900 Hz) — controlled by <strong>mouth opening / jaw height</strong>. Open wide → F1 rises. Distinguishes open vowels (aa) from close vowels (ee).
     <br><br>
-    <strong>F2</strong> (~700–2400 Hz) — controlled by <strong>tongue front/back position</strong>. High front tongue → F2 rises. The single most important formant for vowel identity.
+    <strong>F2</strong> (~700–2500 Hz) — controlled by <strong>tongue front/back position</strong>. High front tongue → F2 rises (up to ~2500 Hz for /i/). The single most important formant for vowel identity.
   </div>
   <canvas id="pd_vowelspace" class="pdiag" height="210"></canvas>
   <div style="text-align:center;font-size:0.58rem;color:#5a6a7a;margin-bottom:10px;">Each vowel is a unique point in F1×F2 space — linguists identify vowels from physics alone</div>
@@ -695,11 +695,11 @@ const physicsHTML = `
     The complete physics chain when you speak:
     <br><br>
     <strong>1. Lungs</strong> → build sub-glottal air pressure<br>
-    <strong>2. Vocal folds</strong> → vibrate at pitch (80–400 Hz), producing harmonic buzz<br>
+    <strong>2. Vocal folds</strong> → vibrate at pitch (80–300 Hz for speech; singers extend to ~60–1100 Hz), producing harmonic buzz<br>
     <strong>3. Vocal tract</strong> → resonant cavity; shape selects which harmonics are amplified (formants)<br>
     <strong>4. Lips / nose</strong> → radiate the shaped sound outward<br>
     <strong>5. Cochlea</strong> → decomposes sound back into frequencies; brain maps to pitch, vowel, timbre<br><br>
-    Every vowel = a unique F1/F2 coordinate, consistent across all speakers of a language.
+    Every vowel occupies a characteristic F1/F2 region. The <em>relative topology</em> (which vowels have higher/lower F1 and F2) is consistent across speakers of a language, but absolute Hz values vary significantly by vocal tract size — a child's formants are much higher than an adult's, and women's higher than men's, all producing the same perceived vowels.
   </div>
   <canvas id="pd_chain" class="pdiag" height="80"></canvas>
   <div class="phys-analogy">Your voice is a wind instrument built inside your body, tunable in real time by muscles you have practiced since infancy.</div>
@@ -859,7 +859,7 @@ function startPhysicsAnims() {
       { label: 'Cold air (0°C)',      speed: 331,  color: '#4af0c4', note: 'low-energy molecules' },
       { label: 'Room air (20°C)',     speed: 343,  color: '#f0c040', note: 'standard reference' },
       { label: 'Body temp air (37°C)',speed: 353,  color: '#f06050', note: 'inside your throat' },
-      { label: 'Helium (20°C)',       speed: 927,  color: '#e080ff', note: 'light molecules, very fast' },
+      { label: 'Helium (20°C)',       speed: 972,  color: '#e080ff', note: 'low density, very fast' },
     ];
 
     const maxSpeed = 1000;
@@ -909,7 +909,7 @@ function startPhysicsAnims() {
     // Temperature scale hint at bottom
     sc.fillStyle = '#2a3a4a';
     sc.font = '7.5px Space Mono,monospace';
-    sc.fillText('Speed increases ~0.6 m/s per °C rise in temperature   |   v = √(γP/ρ)', mx, startY + media.length * (barH + gap) + 10);
+    sc.fillText('v = √(γRT/M)  |  speed rises ~0.6 m/s per °C  |  depends on temperature & gas composition', mx, startY + media.length * (barH + gap) + 10);
   })();
 
   // --- 4. RESONANCE: IN-SYNC vs OUT-OF-SYNC ---
